@@ -5,3 +5,7 @@ node_modules/
 __pycache__/
 .venv/
 .DS_Store
+events.db
+.favicons/
+*.log
+web/.env.local

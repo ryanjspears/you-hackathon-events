@@ -1,0 +1,152 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" font-family="Inter, Helvetica Neue, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/>
+    </marker>
+    <marker id="arrow-you" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7c3aed"/>
+    </marker>
+    <marker id="arrow-oai" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#0f766e"/>
+    </marker>
+    <style>
+      .title { font-size: 30px; font-weight: 700; fill: #0f172a; }
+      .sub   { font-size: 15px; fill: #475569; }
+      .zone  { font-size: 13px; font-weight: 700; letter-spacing: .12em; fill: #64748b; }
+      .h     { font-size: 20px; font-weight: 700; fill: #0f172a; }
+      .h2    { font-size: 16px; font-weight: 600; fill: #0f172a; }
+      .t     { font-size: 13.5px; fill: #334155; }
+      .tm    { font-size: 12.5px; fill: #475569; font-family: "SF Mono", Menlo, Consolas, monospace; }
+      .lbl   { font-size: 12.5px; fill: #334155; font-weight: 600; }
+      .edge  { stroke: #475569; stroke-width: 2.2; fill: none; marker-end: url(#arrow); }
+      .edge2 { stroke: #475569; stroke-width: 2.2; fill: none; marker-end: url(#arrow); marker-start: url(#arrow); }
+      .you   { stroke: #7c3aed; stroke-width: 2.4; fill: none; marker-end: url(#arrow-you); }
+      .oai   { stroke: #0f766e; stroke-width: 2.4; fill: none; marker-end: url(#arrow-oai); }
+      .box   { rx: 14; stroke-width: 2; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="1000" fill="#f8fafc"/>
+  <text x="60" y="58" class="title">Events Scanner — how the vendors connect</text>
+  <text x="60" y="84" class="sub">One search: chat → CrewAI crew → One → Daytona sandbox runs scan.py → You.com + OpenAI → events back to the browser</text>
+
+  <!-- ===== LAPTOP ZONE ===== -->
+  <rect x="60" y="112" width="1480" height="428" rx="20" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="8 6"/>
+  <text x="84" y="140" class="zone">YOUR MAC  ·  uvicorn api.main:app + next dev</text>
+
+  <!-- Browser -->
+  <rect x="90" y="170" width="220" height="118" class="box" fill="#f1f5f9" stroke="#94a3b8"/>
+  <text x="110" y="200" class="h">Browser</text>
+  <text x="110" y="224" class="t">Next.js 16 + shadcn/ui</text>
+  <text x="110" y="244" class="t">chat box, live worklog,</text>
+  <text x="110" y="264" class="t">event list, “I'm going”</text>
+
+  <!-- FastAPI -->
+  <rect x="370" y="170" width="300" height="118" class="box" fill="#f1f5f9" stroke="#94a3b8"/>
+  <text x="390" y="200" class="h">FastAPI</text>
+  <text x="390" y="224" class="tm">GET /api/chat/stream (SSE)</text>
+  <text x="390" y="244" class="tm">POST /api/events/{id}/interact</text>
+  <text x="390" y="264" class="t">SQLite · one crew at a time</text>
+
+  <!-- CrewAI -->
+  <rect x="750" y="170" width="760" height="150" class="box" fill="#fff7ed" stroke="#f97316"/>
+  <text x="772" y="200" class="h">CrewAI crew</text>
+  <text x="900" y="200" class="t">three agents, sequential · LLM: OpenAI gpt-5.6-luna</text>
+  <rect x="772" y="220" width="220" height="80" rx="10" fill="#ffffff" stroke="#fdba74"/>
+  <text x="788" y="246" class="h2">1 · Planner</text>
+  <text x="788" y="268" class="t">message → SearchPlan</text>
+  <text x="788" y="288" class="t">city, dates, categories</text>
+  <rect x="1020" y="220" width="220" height="80" rx="10" fill="#ffffff" stroke="#fdba74"/>
+  <text x="1036" y="246" class="h2">2 · Scanner</text>
+  <text x="1036" y="268" class="t">runs scan.py in Daytona</text>
+  <text x="1036" y="288" class="t">repairs it if it crashes</text>
+  <rect x="1268" y="220" width="220" height="80" rx="10" fill="#ffffff" stroke="#fdba74"/>
+  <text x="1284" y="246" class="h2">3 · Curator</text>
+  <text x="1284" y="268" class="t">ranks the events</text>
+  <text x="1284" y="288" class="t">writes the reply</text>
+  <path d="M 992 260 L 1018 260" class="edge"/>
+  <path d="M 1240 260 L 1266 260" class="edge"/>
+
+  <!-- One -->
+  <rect x="750" y="370" width="760" height="140" class="box" fill="#eef2ff" stroke="#4f46e5"/>
+  <text x="772" y="400" class="h">One</text>
+  <text x="830" y="400" class="t">withone.ai · the crew's only gateway to the outside</text>
+  <text x="772" y="428" class="tm">npx -y @withone/mcp  →  list · search · knowledge · execute</text>
+  <text x="772" y="452" class="t">Daytona actions resolved at startup (create / execute / delete sandbox), never hardcoded</text>
+  <text x="772" y="476" class="tm">one mem add / search   →   “Learned: …”  /  “Recalled: …”  (preferences, per user)</text>
+  <text x="772" y="498" class="t">managed auth · audit log · sandboxes can't reach *.withone.ai, so the crew stays here</text>
+
+  <!-- edges on the laptop -->
+  <path d="M 310 229 L 368 229" class="edge2"/>
+  <text x="300" y="216" class="lbl">HTTP + SSE</text>
+  <path d="M 670 229 L 748 229" class="edge2"/>
+  <text x="676" y="218" class="lbl">plan · events</text>
+  <path d="M 1130 320 L 1130 368" class="edge2"/>
+  <text x="1142" y="350" class="lbl">MCP tool calls (stdio)</text>
+  <path d="M 520 288 L 520 440 L 748 440" class="edge2"/>
+  <text x="535" y="430" class="lbl">one mem (CLI)</text>
+
+  <!-- ===== CLOUD ZONE ===== -->
+  <rect x="60" y="580" width="1480" height="380" rx="20" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="8 6"/>
+  <text x="84" y="608" class="zone">CLOUD</text>
+
+  <!-- Daytona -->
+  <rect x="460" y="640" width="680" height="200" class="box" fill="#ecfdf5" stroke="#10b981"/>
+  <text x="482" y="670" class="h">Daytona sandbox</text>
+  <text x="670" y="670" class="t">created through One · ttlMinutes 120 · egress: You.com, OpenAI, PyPI only</text>
+  <rect x="482" y="688" width="636" height="134" rx="10" fill="#ffffff" stroke="#6ee7b7"/>
+  <text x="498" y="712" class="h2">harness.py  ▸  scan.py</text>
+  <text x="700" y="712" class="t">the only place agent-run code executes</text>
+  <text x="498" y="738" class="t">8 You.com searches → pick listing pages (+ Eventbrite / Meetup directory seeds)</text>
+  <text x="498" y="760" class="t">→ read pages via Contents → OpenAI extraction per page → normalize &amp; dedupe</text>
+  <text x="498" y="786" class="tm">prints {"events": [...], "dropped": {...}, "stats": {...}}</text>
+  <text x="498" y="808" class="t">progress log streamed back to the browser every 3 s · agent repairs the script on a traceback</text>
+
+  <path d="M 1000 510 L 1000 638" class="edge2"/>
+  <text x="1014" y="560" class="lbl">One passthrough → Daytona API</text>
+  <text x="1014" y="580" class="lbl">write script.py + input.json · run · poll</text>
+
+  <!-- You.com -->
+  <rect x="90" y="660" width="330" height="270" class="box" fill="#f5f3ff" stroke="#7c3aed"/>
+  <text x="112" y="692" class="h">You.com</text>
+  <text x="112" y="720" class="tm">POST ydc-index.io/v1/search</text>
+  <text x="112" y="742" class="t">1 general + 7 site: queries in parallel</text>
+  <text x="112" y="762" class="t">(Eventbrite, Meetup, Luma, Dice, RA,</text>
+  <text x="112" y="782" class="t">Songkick, Time Out) · highlights</text>
+  <text x="112" y="812" class="tm">POST ydc-index.io/v1/contents</text>
+  <text x="112" y="834" class="t">up to 10 listing pages as markdown</text>
+  <text x="112" y="870" class="t">≈ 5¢ per search · billed per call</text>
+  <text x="112" y="892" class="t">called directly from scan.py</text>
+  <text x="112" y="912" class="t">(YDC_API_KEY in the sandbox env)</text>
+
+  <!-- OpenAI -->
+  <rect x="1180" y="660" width="330" height="270" class="box" fill="#f0fdfa" stroke="#0f766e"/>
+  <text x="1202" y="692" class="h">OpenAI</text>
+  <text x="1202" y="720" class="tm">chat/completions</text>
+  <text x="1202" y="742" class="t">gpt-5.6-luna</text>
+  <text x="1202" y="772" class="h2">extraction</text>
+  <text x="1202" y="794" class="t">page text → JSON events</text>
+  <text x="1202" y="814" class="t">one call per page, 4 parallel</text>
+  <text x="1202" y="844" class="h2">crew agents</text>
+  <text x="1202" y="866" class="t">Planner / Scanner / Curator</text>
+  <text x="1202" y="896" class="t">≈ 2¢ per search</text>
+
+  <!-- edges from sandbox to You.com / OpenAI -->
+  <path d="M 460 730 L 422 730" class="you"/>
+  <text x="440" y="630" class="lbl" fill="#6d28d9" text-anchor="middle">search + read pages ↓</text>
+  <path d="M 1140 740 L 1178 740" class="oai"/>
+  <text x="1146" y="726" class="lbl" fill="#0f766e">extract</text>
+
+  <!-- crew agents → OpenAI, routed down the right-hand margin -->
+  <path d="M 1400 320 L 1400 345 L 1525 345 L 1525 630 L 1345 630 L 1345 658" class="oai"/>
+  <text x="1410" y="338" class="lbl" fill="#0f766e">agent reasoning</text>
+
+  <!-- legend -->
+  <text x="470" y="880" class="zone">LEGEND</text>
+  <rect x="470" y="895" width="18" height="18" rx="4" fill="#fff7ed" stroke="#f97316" stroke-width="2"/><text x="496" y="909" class="t">CrewAI — orchestration</text>
+  <rect x="730" y="895" width="18" height="18" rx="4" fill="#eef2ff" stroke="#4f46e5" stroke-width="2"/><text x="756" y="909" class="t">One — MCP gateway + memory</text>
+  <rect x="960" y="895" width="18" height="18" rx="4" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/><text x="986" y="909" class="t">Daytona — sandboxed code</text>
+  <rect x="470" y="921" width="18" height="18" rx="4" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/><text x="496" y="935" class="t">You.com — web search + contents</text>
+  <rect x="730" y="921" width="18" height="18" rx="4" fill="#f0fdfa" stroke="#0f766e" stroke-width="2"/><text x="756" y="935" class="t">OpenAI — LLM</text>
+  <line x1="960" y1="930" x2="990" y2="930" class="edge2"/><text x="1000" y="935" class="t">request / response</text>
+</svg>

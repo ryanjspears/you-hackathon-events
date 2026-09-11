@@ -1,6 +1,8 @@
 # Hackathon plan — Build with YOU: The Live Web Agent Hackathon
 
-NYC, 2026-09-11. **Theme: self-repairing & learning agents.** Required vendors: **You.com, One, Daytona, CrewAI.** Sources: `docs/one-skill.md`, `docs/one-hackathon-page.md`, `docs/you-com/`, `docs/daytona/`.
+> **2026-09-11 pivot:** the project is now **Events Scanner** (chat → You.com event search via One → Daytona-cleaned events → learned preferences + recommendations). Architecture and status live in `ARCH.md`; the Dep Doctor material below is kept for reference only.
+
+NYC, 2026-09-11. **Theme: self-repairing & learning agents.** Required vendors: **You.com, One, Daytona, CrewAI.** Official brief (requirements + judging rubric): `docs/hackathon-brief.md`. Sources: `docs/one-skill.md`, `docs/one-hackathon-page.md`, `docs/you-com/`, `docs/daytona/`.
 
 ## Hard constraints (from the One skill — verified 2026-09-10)
 
@@ -11,6 +13,16 @@ NYC, 2026-09-11. **Theme: self-repairing & learning agents.** Required vendors: 
 - `.env` for the crew: `ANTHROPIC_API_KEY`, `ONE_SECRET` (same key the CLI uses), `ONE_CONNECTION_KEYS=live::you::…,live::daytona::…,…`.
 - Learning: `one mem add note '{"content": …}' --tags … --weight N` after each run; `one mem search` before the next. First `one mem` call bootstraps embedded Postgres (~25s).
 - Demo convention judges expect: run twice; print `Recalled:` and `Learned:` lines so the second run visibly benefits.
+
+## Deliverables (from `docs/hackathon-brief.md`)
+
+- [ ] Public GitHub repo, organized, README covers setup end-to-end
+- [ ] 1–3 min YouTube demo video (show run 1 → `Learned:`, run 2 → `Recalled:`, and the real-system side effect)
+- [ ] 200-word description: problem, tech stack, API use
+- [ ] ≥1 You.com endpoint + CrewAI + Daytona + One all load-bearing
+- [ ] "Clean Data" requirement — confirm with organizers what this means (a partner? no scraped/PII data?)
+
+Rubric (1–5 each): completed the loop (changed something in a real system), technical implementation, innovation, impact, presentation/docs. "Completed the loop" is why the Publisher step (PR / email) is not optional.
 
 ## What "all four vendors" looks like in one loop
 

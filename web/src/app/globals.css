@@ -1,0 +1,215 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  --font-display: var(--font-sans);
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-heading: var(--font-sans);
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-brand-text: var(--brand-text);
+  --color-memory: var(--memory);
+  --color-memory-soft: var(--memory-soft);
+  --color-memory-text: var(--memory-text);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.5);
+  --radius-md: calc(var(--radius) * 0.75);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.5);
+  --radius-2xl: calc(var(--radius) * 2);
+  --radius-3xl: calc(var(--radius) * 3);
+  --radius-4xl: calc(var(--radius) * 4);
+}
+
+/*
+ * Palette lifted from luma.com's design tokens (Sept 2026):
+ * ground #151515 / #fff, grays 10–100, cranberry #f31a7c as the brand, purple #682fff,
+ * green #3cbd2c, yellow, red; dividers are 8 % of the foreground, cards 4 %.
+ * Primary actions are inverted (white on dark, ink on light); cranberry is the accent.
+ */
+:root {
+  --background: #ffffff;
+  --foreground: #151515;
+  --card: #ffffff;
+  --card-foreground: #151515;
+  --popover: #ffffff;
+  --popover-foreground: #151515;
+  --primary: #151515;
+  --primary-foreground: #ffffff;
+  --secondary: #f8f8f8;
+  --secondary-foreground: #151515;
+  --muted: #f8f8f8;
+  --muted-foreground: #757575;
+  --accent: #ececec;
+  --accent-foreground: #151515;
+  --destructive: #ed2b32;
+  --border: rgba(21, 21, 21, 0.08);
+  --input: #ececec;
+  --ring: #f31a7c;
+  --brand: #f31a7c;
+  --brand-foreground: #ffffff;
+  --brand-text: #d5176d;
+  --memory: #682fff;
+  --memory-soft: rgba(104, 47, 255, 0.1);
+  --memory-text: #5b29df;
+  --success: #3cbd2c;
+  --warning: #d69712;
+  --chart-1: #f31a7c;
+  --chart-2: #682fff;
+  --chart-3: #757575;
+  --chart-4: #b5b5b5;
+  --chart-5: #353535;
+  --radius: 0.5rem;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #151515;
+  --sidebar-primary: #151515;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: rgba(149, 149, 149, 0.13);
+  --sidebar-accent-foreground: #151515;
+  --sidebar-border: rgba(21, 21, 21, 0.08);
+  --sidebar-ring: #f31a7c;
+}
+
+.dark {
+  --background: #151515;
+  --foreground: #ffffff;
+  --card: #1c1c1c;
+  --card-foreground: #ffffff;
+  --popover: #232323;
+  --popover-foreground: #ffffff;
+  --primary: #ffffff;
+  --primary-foreground: #151515;
+  --secondary: #232323;
+  --secondary-foreground: #ffffff;
+  --muted: #232323;
+  --muted-foreground: rgba(255, 255, 255, 0.64);
+  --accent: #353535;
+  --accent-foreground: #ffffff;
+  --destructive: #ff766d;
+  --border: rgba(255, 255, 255, 0.08);
+  --input: #353535;
+  --ring: #f31a7c;
+  --brand: #f31a7c;
+  --brand-foreground: #ffffff;
+  --brand-text: #f98dbe;
+  --memory: #b596ff;
+  --memory-soft: rgba(104, 47, 255, 0.16);
+  --memory-text: #b596ff;
+  --success: #77d86b;
+  --warning: #f2ca77;
+  --chart-1: #f31a7c;
+  --chart-2: #b596ff;
+  --chart-3: #959595;
+  --chart-4: #555555;
+  --chart-5: #d4d4d4;
+  --sidebar: #151515;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #ffffff;
+  --sidebar-primary-foreground: #151515;
+  --sidebar-accent: rgba(149, 149, 149, 0.13);
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-ring: #f31a7c;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    -webkit-font-smoothing: antialiased;
+  }
+  html {
+    @apply font-sans;
+  }
+  ::selection {
+    background: var(--brand);
+    color: var(--brand-foreground);
+  }
+}
+
+@layer utilities {
+  .tnum {
+    font-variant-numeric: tabular-nums;
+  }
+  /* Luma's translucent card: 4 % of the foreground for both fill and hairline. */
+  .lux-card {
+    background: color-mix(in srgb, var(--foreground) 4%, transparent);
+    border: 1px solid color-mix(in srgb, var(--foreground) 4%, transparent);
+  }
+  .lux-card-hover:hover {
+    background: color-mix(in srgb, var(--foreground) 7%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Status line while the agent works: a highlight sweeps through the words (like a "thinking" shimmer). */
+@keyframes shimmer-text {
+  from { background-position: 200% center; }
+  to { background-position: -200% center; }
+}
+.shimmer-text {
+  color: transparent;
+  background-image: linear-gradient(
+    90deg,
+    color-mix(in oklch, var(--foreground) 38%, transparent) 0%,
+    color-mix(in oklch, var(--foreground) 38%, transparent) 30%,
+    var(--foreground) 45%,
+    var(--foreground) 55%,
+    color-mix(in oklch, var(--foreground) 38%, transparent) 70%,
+    color-mix(in oklch, var(--foreground) 38%, transparent) 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: shimmer-text 1.8s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .shimmer-text { animation: none; color: var(--foreground); background-image: none; }
+}

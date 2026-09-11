@@ -4,9 +4,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Entry for **"Build with YOU: The Live Web Agent Hackathon"** (You.com, New York, 2026-09-11). **Theme: self-repairing & learning agents.** All four vendors must be used: **You.com** (web search / contents / research), **One** (withone.ai — one MCP/CLI over 780+ apps incl. You.com and Daytona), **Daytona** (sandboxes for running agent-generated code), **CrewAI** (orchestration). Reference architecture: a CrewAI crew on the laptop gets One's four tools via `npx -y @withone/mcp` and drives You.com + Daytona + a side-effect app (GitHub/Gmail/Slack) through One; learning via `one mem`. Sandboxes cannot reach `*.withone.ai`, so the crew never runs inside Daytona. `PLAN.md` has the chosen idea, constraints, and build order — read it first. Hackathon page saved at `docs/one-hackathon-page.md`. Update this file with build/test/run commands once code exists.
+**Events Scanner** — entry for **"Build with YOU: The Live Web Agent Hackathon"** (You.com, New York, 2026-09-11). **Theme: self-improving & learning agents.** A chat where a **CrewAI** crew (Planner → Scanner → Curator) runs `api/scripts/scan.py` in a **Daytona** sandbox through **One**; the script calls **You.com** (search + contents) to find events, the Scanner repairs it if it crashes, and preferences are learned in `one mem`. **Read `ARCH.md` first** — topology, request flows, data model, and the rules every component follows. `PLAN.md` has the build plan; `docs/hackathon-brief.md` the requirements + rubric; `docs/one-hackathon-page.md` the One hackathon page.
 
-Secrets live in `.env` (git-ignored): `YDC_API_KEY`, `DAYTONA_API_KEY`.
+Layout: `api/` (FastAPI + CrewAI; `one_client.py`, `sandbox.py`, `crew.py`, `mem.py`, `recommender.py`, `store.py`, `main.py`, `progress.py`, `trace.py`, `scripts/{harness,scan,recommend_v0}.py`), `web/` (Next.js 16 + shadcn/ui; contract in `SPEC.md`), `scripts/demo.sh`.
+
+Commands (from repo root, `.venv` = Python 3.12):
+- Install: `python3.12 -m venv .venv && .venv/bin/pip install -r api/requirements.txt`; `cd web && npm install`
+- Selftest (One → You.com search + Daytona sandbox): `.venv/bin/python -m api.one_client --selftest`
+- Tests: `.venv/bin/pytest api/tests`
+- Run API: `.venv/bin/uvicorn api.main:app --port 8000` (health: `GET /api/health`); UI: `cd web && npm run dev` → http://localhost:3000
+- Demo (two-run story): `scripts/demo.sh <user>`
+- Frontend checks: `cd web && npx tsc --noEmit -p . && npx eslint src`
+
+Frontend components: `web/` is shadcn/ui (base-ui variant — `Button`/`Badge` take a `render` prop, there is no `asChild`). For chat/agent UI (messages, attachments, tool/worklog, prompt input, etc.) use **AI Elements** — https://elements.ai-sdk.dev (e.g. https://elements.ai-sdk.dev/components/attachments). They are shadcn-style components added into `web/src/components/ai-elements/` with `npx ai-elements@latest add <component>`; check the component's page for its API before using it, and prefer them over hand-rolling equivalents. Backend contract for the UI is `SPEC.md`.
+
+Secrets live in `.env` (git-ignored): `YDC_API_KEY`, `DAYTONA_API_KEY` (SDK fallback only), `ONE_SECRET`, `ONE_CONNECTION_KEYS`, `OPENAI_API_KEY`. See `.env.example`.
 
 ## Reference docs (local, offline)
 

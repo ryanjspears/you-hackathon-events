@@ -1,0 +1,12 @@
+crewai[anthropic]==1.15.2
+crewai-tools[mcp]==1.15.2
+mcp~=1.26.0
+mcpadapt>=0.1.9,<0.2
+fastapi
+uvicorn[standard]
+sse-starlette
+httpx
+python-dotenv
+pydantic
+python-dateutil
+pytest
