@@ -4,11 +4,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Hackathon project built on the **You.com APIs** (real-time web search, content extraction, cited answers/research). No application code exists yet — the stack will be chosen as the project takes shape. Update this file with build/test/run commands once they exist.
+Entry for **"Build with YOU: The Live Web Agent Hackathon"** (You.com, New York, 2026-09-11). Sponsors/tools in play: **You.com** APIs (web search, contents, cited answers/research), **One** (withone.ai — one MCP/CLI that acts on 780+ apps incl. You.com and Daytona), and **Daytona** (sandboxes for running agent-generated code). No application code exists yet; `PLAN.md` holds the candidate ideas. Update this file with build/test/run commands once they exist.
 
-## You.com reference docs (local, offline)
+Secrets live in `.env` (git-ignored): `YDC_API_KEY`, `DAYTONA_API_KEY`.
 
-`docs/you-com/` is a full mirror of https://you.com/docs (snapshot 2026-09-11), fetched as Markdown. **Read these before answering any question about the You.com API instead of guessing or searching the web.**
+## Reference docs (local, offline)
+
+Three doc mirrors live under `docs/`. **Read these before answering questions about these products instead of guessing or searching the web.**
+
+- `docs/you-com/` — full mirror of https://you.com/docs (snapshot 2026-09-11). Table below.
+- `docs/daytona/` — mirror of https://www.daytona.io/docs (snapshot 2026-09-10; Ruby/Java/Go SDK pages omitted). Index: `docs/daytona/llms.txt`. Start at `en.md` (intro + quickstart), `sandboxes.md`, `process-code-execution.md`, `file-system-operations.md`, `snapshots.md`, `typescript-sdk/` and `python-sdk/` (per-class reference), `guides/` (49 how-tos), `mcp.md`, `agent-skills.md`. OpenAPI: `openapi.json` (control plane), `toolbox-openapi.json` (in-sandbox toolbox).
+- `docs/one-skill.md` — the One hackathon skill (https://hackathon.withone.ai/skill.md): setup paths, the list → search → knowledge → execute loop, You.com and Daytona via One, CrewAI, One Connect, troubleshooting.
+
+### You.com docs map
 
 | Need | File |
 | --- | --- |
@@ -46,11 +54,16 @@ SDKs: `pip install youdotcom` (`from youdotcom import You` — covers all 5 APIs
 
 Hackathon guidance: for demos, `Answer` is the fastest path to a grounded, cited response in one call; `Search` + `extraction_mode: "full_page"` when you need to feed pages to your own LLM; `Research` at `standard` for a "wow" multi-source report (use `background: true` for `deep`+ so the UI doesn't hang on a timeout).
 
+## Daytona cheat sheet
+
+Auth: `DAYTONA_API_KEY` (dashboard: https://app.daytona.io/dashboard/keys). SDKs: `npm install @daytona/sdk` / `pip install daytona`. Core loop: `daytona.create()` → `sandbox.process.codeRun(code)` / `sandbox.process.executeCommand(cmd)` → `sandbox.fs.*` for files → `sandbox.delete()`. Sandboxes start in <90 ms, auto-pause/auto-delete are configurable, `snapshots.md` covers persistent images, `preview.md` covers exposing ports. Also reachable through One as platform `daytona`. Claude Code plugin available: `claude plugin marketplace add daytona/skills && claude plugin install daytona@daytona --scope user`.
+
 ## MCP servers (`.mcp.json`, project scope)
 
 - **`you-com-docs`** (https://you.com/docs/_mcp/server, no auth) — `searchDocs` tool returning doc passages with source URLs. Use it for anything not covered by the local mirror or when the mirror may be stale.
-- **`you-com`** (https://api.you.com/mcp, OAuth 2.1 — sign in with a You.com account on first use; credentials are stored per-user, nothing in the repo) — live tools `you-search`, `you-contents`, `you-answer`, `you-research`, `you-finance`. These hit the billed APIs, so prefer them for verifying real response shapes and prototyping queries, not for bulk work. `you-discover` recommends which You.com API/SDK/integration fits a task.
+- **`you-com`** (https://api.you.com/mcp, OAuth 2.1 — sign in with a You.com account on first use; credentials are stored per-user, nothing in the repo) — live tools `you-search`, `you-contents`, `you-answer`, `you-research`, `you-finance`. These hit the billed APIs, so prefer them for verifying real response shapes and prototyping queries, not for bulk work. `you-discover` is an Agentic Resource Discovery search over GitHub/Hugging Face agent catalogs (third-party MCP servers and skills) — not an ideation tool and it does not surface You.com's own resources.
+- **`one`** (https://mcp.withone.ai/mcp, OAuth) — One's four tools: `list_one_integrations`, `search_one_platform_actions`, `get_one_action_knowledge`, `execute_one_action`. Remote server uses **snake_case** params. Always run the loop in order (list → search → knowledge → execute); never invent an `action_id` or connection key; confirm before any write. The `one@one` plugin (user scope) and the `one` CLI (`@withone/cli`, `one --agent …` for JSON) are also installed. Platform slugs: `you`, `daytona`, `gmail`, `slack`, …
 
-Both need one-time approval in Claude Code (`/mcp`). Setup details: `docs/you-com/build-with-agents/agent-harnesses/claude-code.md`.
+All need one-time approval in Claude Code (`/mcp`). Setup details: `docs/you-com/build-with-agents/agent-harnesses/claude-code.md`, `docs/one-skill.md`.
 
 The official **`you@you-com` plugin** (user-scoped, from marketplace `youdotcom-oss/agent-skills`) is also installed on this machine. It adds skills `you-web` (search / URL reads / cited synthesis), `you-research`, `you-finance`, `you-discover` (picks the right You.com API/SDK/integration for a task), `you-free`, and its own MCP servers `you` (same URL as `you-com` above), `you-finance`, `you-research`. Prefer those skills over raw tool calls. Onboarding skill source: `docs/you-com/skill.md` (from https://you.com/skill.md).

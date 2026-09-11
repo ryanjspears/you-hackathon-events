@@ -7,6 +7,10 @@
     "you-com": {
       "type": "http",
       "url": "https://api.you.com/mcp"
+    },
+    "one": {
+      "type": "http",
+      "url": "https://mcp.withone.ai/mcp"
     }
   }
 }
