@@ -1,0 +1,244 @@
+openapi: 3.1.0
+info:
+  title: Finance Research
+  version: 1.0.0
+paths:
+  /v1/finance_research:
+    post:
+      operationId: finance_research
+      summary: Returns comprehensive finance-grade research answers with multi-step reasoning
+      description: >-
+        The Finance Research API is purpose-built for financial questions. Like the Research API, it runs multiple
+        searches, reads through sources, and synthesizes everything into a thorough, well-cited answer — but its
+        retrieval index is optimized for financial data: earnings reports, SEC filings, analyst coverage, market data,
+        and financial news.
+
+        Use it when you need credible, sourced answers to financial questions: company fundamentals, market trends,
+        competitive analysis, earnings summaries, or macroeconomic research.
+      parameters:
+        - name: X-API-Key
+          in: header
+          description: >-
+            A unique API Key is required to authorize API access. [Get your API Key with free
+            credits](https://you.com/platform).
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A JSON object containing a comprehensive finance-grade answer with citations and supporting search results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/finance_research_Response_200'
+        '401':
+          description: Unauthorized. Problems with API key.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Finance_researchRequestUnauthorizedError'
+        '403':
+          description: Forbidden. API key lacks scope for this path.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Finance_researchRequestForbiddenError'
+        '422':
+          description: Unprocessable Entity. Request validation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Finance_researchRequestUnprocessableEntityError'
+        '500':
+          description: Internal Server Error during authentication/authorization middleware.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Finance_researchRequestInternalServerError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                input:
+                  type: string
+                  maxLength: 40000
+                  description: >-
+                    The financial research question or complex query requiring in-depth investigation and multi-step
+                    reasoning.
+
+
+                    Note: The maximum length of the input is 40,000 characters.
+                research_effort:
+                  $ref: '#/components/schemas/V1FinanceResearchPostRequestBodyContentApplicationJsonSchemaResearchEffort'
+                  default: deep
+                  description: >-
+                    Controls how much time and effort the Finance Research API spends on your question. Higher effort
+                    levels run more searches and dig deeper into sources, at the cost of a longer response time.
+
+
+                    Available levels:
+
+                    - `deep`: The default. Spends more time researching and cross-referencing sources. Good for most
+                    financial questions, including multi-company comparisons, earnings analysis, and regulatory
+                    research.
+
+                    - `exhaustive`: The most thorough option. Explores the topic as fully as possible, best suited for
+                    complex financial research tasks where you want the highest quality result.
+              required:
+                - input
+servers:
+  - url: https://api.you.com
+    description: Production
+components:
+  schemas:
+    V1FinanceResearchPostRequestBodyContentApplicationJsonSchemaResearchEffort:
+      type: string
+      enum:
+        - deep
+        - exhaustive
+      default: deep
+      description: >-
+        Controls how much time and effort the Finance Research API spends on your question. Higher effort levels run
+        more searches and dig deeper into sources, at the cost of a longer response time.
+
+
+        Available levels:
+
+        - `deep`: The default. Spends more time researching and cross-referencing sources. Good for most financial
+        questions, including multi-company comparisons, earnings analysis, and regulatory research.
+
+        - `exhaustive`: The most thorough option. Explores the topic as fully as possible, best suited for complex
+        financial research tasks where you want the highest quality result.
+      title: V1FinanceResearchPostRequestBodyContentApplicationJsonSchemaResearchEffort
+    V1FinanceResearchPostResponsesContentApplicationJsonSchemaOutputContentType:
+      type: string
+      enum:
+        - text
+      description: The format of the content field.
+      title: V1FinanceResearchPostResponsesContentApplicationJsonSchemaOutputContentType
+    V1FinanceResearchPostResponsesContentApplicationJsonSchemaOutputSourcesItems:
+      type: object
+      properties:
+        url:
+          type: string
+          description: The URL of the source webpage.
+        title:
+          type: string
+          description: The title of the source webpage.
+        snippets:
+          type: array
+          items:
+            type: string
+          description: Relevant excerpts from the source page that were used in generating the answer.
+      required:
+        - url
+      title: V1FinanceResearchPostResponsesContentApplicationJsonSchemaOutputSourcesItems
+    V1FinanceResearchPostResponsesContentApplicationJsonSchemaOutput:
+      type: object
+      properties:
+        content:
+          type: string
+          description: >-
+            The comprehensive finance-grade response with inline citations. Content is a Markdown string with numbered
+            citations that reference the items in the sources array.
+        content_type:
+          $ref: '#/components/schemas/V1FinanceResearchPostResponsesContentApplicationJsonSchemaOutputContentType'
+          description: The format of the content field.
+        sources:
+          type: array
+          items:
+            $ref: '#/components/schemas/V1FinanceResearchPostResponsesContentApplicationJsonSchemaOutputSourcesItems'
+          description: A list of web sources used to generate the answer.
+      required:
+        - content
+        - content_type
+        - sources
+      description: The research output containing the answer and sources.
+      title: V1FinanceResearchPostResponsesContentApplicationJsonSchemaOutput
+    finance_research_Response_200:
+      type: object
+      properties:
+        output:
+          $ref: '#/components/schemas/V1FinanceResearchPostResponsesContentApplicationJsonSchemaOutput'
+          description: The research output containing the answer and sources.
+      required:
+        - output
+      title: finance_research_Response_200
+    Finance_researchRequestUnauthorizedError:
+      type: object
+      properties:
+        detail:
+          type: string
+          description: Error detail message.
+      title: Finance_researchRequestUnauthorizedError
+    Finance_researchRequestForbiddenError:
+      type: object
+      properties:
+        detail:
+          type: string
+      title: Finance_researchRequestForbiddenError
+    V1FinanceResearchPostResponsesContentApplicationJsonSchemaDetailItemsLocItems:
+      oneOf:
+        - type: string
+        - type: integer
+      title: V1FinanceResearchPostResponsesContentApplicationJsonSchemaDetailItemsLocItems
+    V1FinanceResearchPostResponsesContentApplicationJsonSchemaDetailItemsInput:
+      oneOf:
+        - type: string
+        - type: object
+          additionalProperties:
+            description: Any type
+      description: The input value that caused the error.
+      title: V1FinanceResearchPostResponsesContentApplicationJsonSchemaDetailItemsInput
+    V1FinanceResearchPostResponsesContentApplicationJsonSchemaDetailItems:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The validation error type.
+        loc:
+          type: array
+          items:
+            $ref: '#/components/schemas/V1FinanceResearchPostResponsesContentApplicationJsonSchemaDetailItemsLocItems'
+          description: The location of the error as a path of segments (strings for field names, integers for byte offsets).
+        msg:
+          type: string
+          description: A human-readable description of the error.
+        input:
+          $ref: '#/components/schemas/V1FinanceResearchPostResponsesContentApplicationJsonSchemaDetailItemsInput'
+          description: The input value that caused the error.
+        ctx:
+          type: object
+          additionalProperties:
+            description: Any type
+          description: Additional context about the error.
+      required:
+        - type
+        - loc
+        - msg
+        - input
+      title: V1FinanceResearchPostResponsesContentApplicationJsonSchemaDetailItems
+    Finance_researchRequestUnprocessableEntityError:
+      type: object
+      properties:
+        detail:
+          type: array
+          items:
+            $ref: '#/components/schemas/V1FinanceResearchPostResponsesContentApplicationJsonSchemaDetailItems'
+      title: Finance_researchRequestUnprocessableEntityError
+    Finance_researchRequestInternalServerError:
+      type: object
+      properties:
+        detail:
+          type: string
+      title: Finance_researchRequestInternalServerError
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: >-
+        A unique API Key is required to authorize API access. [Get your API Key with free
+        credits](https://you.com/platform).

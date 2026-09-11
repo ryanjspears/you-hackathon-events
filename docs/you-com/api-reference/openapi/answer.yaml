@@ -1,0 +1,464 @@
+openapi: 3.1.0
+info:
+  title: Answer
+  version: 1.0.0
+paths:
+  /v1/answer:
+    post:
+      operationId: answer
+      summary: Returns a synthesized answer with citations from web search results
+      description: >-
+        Returns a synthesized natural-language answer with citations and the web results used to generate it. Provide a
+        `query` and optional freshness, locale, domain, and explicit-content controls.
+      parameters:
+        - name: X-API-Key
+          in: header
+          description: >-
+            The unique API Key required to authorize API access. Learn how to get yours in the ["Get your API key"
+            section of the documentation](https://you.com/docs/quickstart#get-your-api-key).
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A JSON object containing a synthesized answer with citations and supporting search results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/answer_Response_200'
+        '401':
+          description: Unauthorized. Problems with API key.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnswerRequestUnauthorizedError'
+        '402':
+          description: Payment Required. The account cannot make paid API requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpgradeRequiredResponse'
+        '403':
+          description: Forbidden. API key lacks scope for this path.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnswerRequestForbiddenError'
+        '422':
+          description: Unprocessable Entity. A request parameter is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnswerRequestUnprocessableEntityError'
+        '500':
+          description: Internal Server Error while authenticating or processing the request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnswerRequestInternalServerError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query:
+                  type: string
+                  pattern: \S
+                  maxLength: 400
+                  description: The search query used to retrieve relevant web results.
+                freshness:
+                  $ref: '#/components/schemas/Freshness'
+                country:
+                  $ref: '#/components/schemas/Country'
+                language:
+                  $ref: '#/components/schemas/Language'
+                safesearch:
+                  $ref: '#/components/schemas/SafeSearch'
+                  default: moderate
+                include_domains:
+                  $ref: '#/components/schemas/IncludeDomains'
+                exclude_domains:
+                  $ref: '#/components/schemas/ExcludeDomains'
+                boost_domains:
+                  $ref: '#/components/schemas/BoostDomains'
+              required:
+                - query
+servers:
+  - url: https://api.you.com
+    description: Production
+components:
+  schemas:
+    Freshness0:
+      type: string
+      enum:
+        - day
+        - week
+        - month
+        - year
+      title: Freshness0
+    Freshness:
+      oneOf:
+        - $ref: '#/components/schemas/Freshness0'
+        - type: string
+          pattern: ^\d{4}-\d{2}-\d{2}to\d{4}-\d{2}-\d{2}$
+      description: >-
+        Specifies the freshness of the results to return. Provide either one of `day`, `week`, `month`, `year`, or a
+        date range string in the format `YYYY-MM-DDtoYYYY-MM-DD`.
+
+
+        When your search query includes a temporal keyword and you also set a freshness parameter, the search will use
+        the broader timeframe. For example, if you use `query=news+this+week&freshness=month`, the results will use a
+        freshness of month.
+      title: Freshness
+    Country:
+      type: string
+      enum:
+        - AR
+        - AU
+        - AT
+        - BE
+        - BR
+        - CA
+        - CL
+        - DK
+        - FI
+        - FR
+        - DE
+        - HK
+        - IN
+        - ID
+        - IT
+        - JP
+        - KR
+        - MY
+        - MX
+        - NL
+        - NZ
+        - 'NO'
+        - CN
+        - PL
+        - PT
+        - PH
+        - RU
+        - SA
+        - ZA
+        - ES
+        - SE
+        - CH
+        - TW
+        - TR
+        - GB
+        - US
+      description: A supported country code that determines the geographical focus of the web results.
+      title: Country
+    Language:
+      type: string
+      enum:
+        - AR
+        - EU
+        - BN
+        - BG
+        - CA
+        - HR
+        - CS
+        - DA
+        - NL
+        - EN
+        - EN-GB
+        - ET
+        - FI
+        - FR
+        - GL
+        - DE
+        - EL
+        - GU
+        - HE
+        - HI
+        - HU
+        - IS
+        - IT
+        - KN
+        - KO
+        - LV
+        - LT
+        - MS
+        - ML
+        - MR
+        - NB
+        - PL
+        - PA
+        - RO
+        - RU
+        - SR
+        - SK
+        - SL
+        - ES
+        - SV
+        - TA
+        - TE
+        - TH
+        - TR
+        - UK
+        - VI
+      description: A supported BCP 47 language tag that determines the language of the web results.
+      title: Language
+    SafeSearch:
+      type: string
+      enum:
+        - 'off'
+        - moderate
+        - strict
+      default: moderate
+      description: >-
+        Configures the safesearch filter for content moderation. This allows you to decide whether to return NSFW
+        content or not.
+      title: SafeSearch
+    IncludeDomains:
+      type: array
+      items:
+        type: string
+      description: >-
+        Domains to exclusively include in web results. This is a strict allowlist, not a ranking boost. Supports up to
+        500 domains. Cannot be combined with `exclude_domains` or `boost_domains`.
+      title: IncludeDomains
+    ExcludeDomains:
+      type: array
+      items:
+        type: string
+      description: >-
+        Domains to exclude from web results. Supports up to 500 domains. Cannot be combined with `include_domains`. Can
+        be combined with `boost_domains`.
+      title: ExcludeDomains
+    BoostDomains:
+      type: array
+      items:
+        type: string
+      description: >-
+        Domains to prefer in search ranking without excluding results from other domains. Supports up to 500 domains.
+        Can be combined with `exclude_domains`, but not with `include_domains`.
+      title: BoostDomains
+    AnswerCitation:
+      type: object
+      properties:
+        source:
+          type: string
+          description: The URL of the cited source.
+        excerpts:
+          type: array
+          items:
+            type: string
+          description: Verbatim excerpts from the cited source that support the answer.
+      required:
+        - source
+        - excerpts
+      title: AnswerCitation
+    AnswerSearchResult:
+      type: object
+      properties:
+        url:
+          type: string
+          description: The URL of the source webpage.
+        title:
+          type: string
+          description: The title of the source webpage.
+        snippets:
+          type: array
+          items:
+            type: string
+          default: []
+          description: Text snippets from the search result that preview its content.
+        description:
+          type: string
+          description: A brief description of the content of the search result.
+        thumbnail_url:
+          type: string
+          description: URL of the thumbnail.
+        page_age:
+          type: string
+          description: The age of the search result.
+      required:
+        - url
+        - title
+      title: AnswerSearchResult
+    V1AnswerPostResponsesContentApplicationJsonSchemaResults:
+      type: object
+      properties:
+        web:
+          type: array
+          items:
+            $ref: '#/components/schemas/AnswerSearchResult'
+          description: All web search results considered during answer synthesis, whether cited or not.
+      required:
+        - web
+      description: Search results grouped by result type. All current search results are grouped under `web`.
+      title: V1AnswerPostResponsesContentApplicationJsonSchemaResults
+    answer_Response_200:
+      type: object
+      properties:
+        answer:
+          type: string
+          description: The synthesized response with numbered inline citations that reference items in the `citations` array.
+        citations:
+          type: array
+          items:
+            $ref: '#/components/schemas/AnswerCitation'
+          description: >-
+            The sources cited in the answer, in citation order. Each item includes the source URL and verbatim excerpts
+            that support the answer.
+        results:
+          $ref: '#/components/schemas/V1AnswerPostResponsesContentApplicationJsonSchemaResults'
+          description: Search results grouped by result type. All current search results are grouped under `web`.
+      required:
+        - answer
+        - citations
+        - results
+      title: answer_Response_200
+    AnswerRequestUnauthorizedError:
+      type: object
+      properties:
+        detail:
+          type: string
+          description: Error detail message.
+      title: AnswerRequestUnauthorizedError
+    UpgradeRequiredResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: The error code.
+        message:
+          type: string
+          description: A description of the error.
+        upgrade_url:
+          type: string
+          description: The URL for adding credits or upgrading the account.
+        limit:
+          type: integer
+          description: The usage limit, when available.
+        used:
+          type: integer
+          description: The usage consumed, when available.
+        period:
+          type: string
+          description: The usage period, when available.
+        reset_at:
+          type: string
+          description: The reset timestamp, when available.
+      required:
+        - error
+        - message
+        - upgrade_url
+      title: UpgradeRequiredResponse
+    AnswerRequestForbiddenError:
+      type: object
+      properties:
+        detail:
+          type: string
+      title: AnswerRequestForbiddenError
+    V1AnswerPostResponsesContentApplicationJsonSchemaOneOf0DetailItemsLocItems:
+      oneOf:
+        - type: string
+        - type: integer
+      title: V1AnswerPostResponsesContentApplicationJsonSchemaOneOf0DetailItemsLocItems
+    V1AnswerPostResponsesContentApplicationJsonSchemaOneOf0DetailItemsInput:
+      oneOf:
+        - type: string
+        - type: object
+          additionalProperties:
+            description: Any type
+      description: The input value that caused the error.
+      title: V1AnswerPostResponsesContentApplicationJsonSchemaOneOf0DetailItemsInput
+    V1AnswerPostResponsesContentApplicationJsonSchemaOneOf0DetailItems:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The validation error type.
+        loc:
+          type: array
+          items:
+            $ref: '#/components/schemas/V1AnswerPostResponsesContentApplicationJsonSchemaOneOf0DetailItemsLocItems'
+          description: The error location as a path of field names or byte offsets.
+        msg:
+          type: string
+          description: A description of the error.
+        input:
+          $ref: '#/components/schemas/V1AnswerPostResponsesContentApplicationJsonSchemaOneOf0DetailItemsInput'
+          description: The input value that caused the error.
+        ctx:
+          type: object
+          additionalProperties:
+            description: Any type
+          description: Additional context about the error.
+      required:
+        - type
+        - loc
+        - msg
+        - input
+      title: V1AnswerPostResponsesContentApplicationJsonSchemaOneOf0DetailItems
+    AnswerRequestUnprocessableEntityError0:
+      type: object
+      properties:
+        detail:
+          type: array
+          items:
+            $ref: '#/components/schemas/V1AnswerPostResponsesContentApplicationJsonSchemaOneOf0DetailItems'
+      title: AnswerRequestUnprocessableEntityError0
+    APIError:
+      type: object
+      properties:
+        status:
+          type: string
+          description: The HTTP status code.
+        code:
+          type: string
+          description: The error code.
+        title:
+          type: string
+          description: A short error summary.
+        detail:
+          type: string
+          description: A description of the error.
+      required:
+        - status
+        - code
+        - title
+      title: APIError
+    APIErrorResponse:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/APIError'
+      required:
+        - errors
+      title: APIErrorResponse
+    AnswerRequestUnprocessableEntityError:
+      oneOf:
+        - $ref: '#/components/schemas/AnswerRequestUnprocessableEntityError0'
+        - $ref: '#/components/schemas/APIErrorResponse'
+      title: AnswerRequestUnprocessableEntityError
+    DetailErrorResponse:
+      type: object
+      properties:
+        detail:
+          type: string
+          description: A description of the error.
+      required:
+        - detail
+      title: DetailErrorResponse
+    AnswerRequestInternalServerError:
+      oneOf:
+        - $ref: '#/components/schemas/DetailErrorResponse'
+        - $ref: '#/components/schemas/APIErrorResponse'
+      title: AnswerRequestInternalServerError
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: >-
+        The unique API Key required to authorize API access. Learn how to get yours in the ["Get your API key" section
+        of the documentation](https://you.com/docs/quickstart#get-your-api-key).

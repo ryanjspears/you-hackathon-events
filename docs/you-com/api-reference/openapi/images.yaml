@@ -1,0 +1,129 @@
+openapi: 3.1.0
+info:
+  title: Images
+  version: 1.0.0
+paths:
+  /v1/images:
+    get:
+      operationId: returnsAListOfImagesHitsForQuery
+      summary: Returns a list of images hits for query
+      description: |-
+        <Warning>
+          **Beta and unmaintained.** This endpoint works, but it is not under active development. The response shape and its availability can change without notice, so do not build a production dependency on it.
+        </Warning>
+
+        Returns the URLs of images associated to the user query.
+
+        Access is limited to early access partners. To request access, email [api@you.com](mailto:api@you.com).
+      parameters:
+        - name: q
+          in: query
+          description: The search query used to retrieve relevant image results from the web.
+          required: true
+          schema:
+            type: string
+            default: The image you are searching for
+        - name: X-API-Key
+          in: header
+          description: >-
+            A unique API Key is required to authorize API access. For details, see how to [get your API
+            Key](/quickstart#get-your-api-key).
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A JSON object containing an array of image search results.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/returnsAListOfImagesHitsForQuery_Response_200'
+        '401':
+          description: Unauthorized. Problems with API key.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReturnsAListOfImagesHitsForQueryRequestUnauthorizedError'
+        '403':
+          description: Forbidden. API key lacks scope for this path.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReturnsAListOfImagesHitsForQueryRequestForbiddenError'
+        '500':
+          description: Internal Server Error during authentication/authorization middleware.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReturnsAListOfImagesHitsForQueryRequestInternalServerError'
+servers:
+  - url: https://api.you.com
+    description: Production
+components:
+  schemas:
+    V1ImagesGetResponsesContentApplicationJsonSchemaImagesResultsItems:
+      type: object
+      properties:
+        title:
+          type: string
+          description: The title of the image result.
+        page_url:
+          type: string
+          description: The URL of the webpage containing the image.
+        image_url:
+          type: string
+          description: The direct URL to the image.
+      title: V1ImagesGetResponsesContentApplicationJsonSchemaImagesResultsItems
+    V1ImagesGetResponsesContentApplicationJsonSchemaImages:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/V1ImagesGetResponsesContentApplicationJsonSchemaImagesResultsItems'
+      title: V1ImagesGetResponsesContentApplicationJsonSchemaImages
+    V1ImagesGetResponsesContentApplicationJsonSchemaMetadata:
+      type: object
+      properties:
+        query:
+          type: string
+          description: Returns the original query submitted.
+        search_uuid:
+          type: string
+          description: The unique identifier for the search request.
+      title: V1ImagesGetResponsesContentApplicationJsonSchemaMetadata
+    returnsAListOfImagesHitsForQuery_Response_200:
+      type: object
+      properties:
+        images:
+          $ref: '#/components/schemas/V1ImagesGetResponsesContentApplicationJsonSchemaImages'
+        metadata:
+          $ref: '#/components/schemas/V1ImagesGetResponsesContentApplicationJsonSchemaMetadata'
+      title: returnsAListOfImagesHitsForQuery_Response_200
+    ReturnsAListOfImagesHitsForQueryRequestUnauthorizedError:
+      type: object
+      properties:
+        detail:
+          type: string
+          description: Error detail message.
+      title: ReturnsAListOfImagesHitsForQueryRequestUnauthorizedError
+    ReturnsAListOfImagesHitsForQueryRequestForbiddenError:
+      type: object
+      properties:
+        detail:
+          type: string
+      title: ReturnsAListOfImagesHitsForQueryRequestForbiddenError
+    ReturnsAListOfImagesHitsForQueryRequestInternalServerError:
+      type: object
+      properties:
+        detail:
+          type: string
+      title: ReturnsAListOfImagesHitsForQueryRequestInternalServerError
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: >-
+        A unique API Key is required to authorize API access. For details, see how to [get your API
+        Key](/quickstart#get-your-api-key).

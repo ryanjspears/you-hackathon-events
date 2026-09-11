@@ -1,0 +1,160 @@
+openapi: 3.1.0
+info:
+  title: Contents
+  version: 1.0.0
+paths:
+  /v1/contents:
+    post:
+      operationId: contents
+      summary: Returns the content of the web pages
+      description: Returns the HTML or Markdown of a target webpage.
+      parameters:
+        - name: X-API-Key
+          in: header
+          description: >-
+            A unique API Key is required to authorize API access. [Get your API Key with free
+            credits](https://you.com/platform).
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: An array of JSON objects containing the page content of each web page
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/V1ContentsPostResponsesContentApplicationJsonSchemaItems'
+        '401':
+          description: Unauthorized. Problems with API key.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentsRequestUnauthorizedError'
+        '403':
+          description: Forbidden. API key lacks scope for this path.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentsRequestForbiddenError'
+        '500':
+          description: Internal Server Error during authentication/authorization middleware.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentsRequestInternalServerError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                urls:
+                  type: array
+                  items:
+                    type: string
+                    format: uri
+                  description: Array of URLs to fetch the contents from.
+                formats:
+                  $ref: '#/components/schemas/ContentsFormats'
+                crawl_timeout:
+                  type: integer
+                  minimum: 1
+                  maximum: 60
+                  default: 10
+                  description: >-
+                    Maximum time in seconds to wait for page content. Must be between 1 and 60 seconds. Default is 10
+                    seconds.
+                max_age:
+                  type:
+                    - integer
+                    - 'null'
+                  minimum: 0
+                  description: >-
+                    Maximum allowed age of cached content in seconds. When set, cached content older than this threshold
+                    is ignored and the page is re-fetched. Must be 0 or greater. Default is null (no age limit, cached
+                    content is returned regardless of age).
+servers:
+  - url: https://ydc-index.io
+    description: Production
+components:
+  schemas:
+    ContentsFormatsItems:
+      type: string
+      enum:
+        - html
+        - markdown
+        - metadata
+      title: ContentsFormatsItems
+    ContentsFormats:
+      type: array
+      items:
+        $ref: '#/components/schemas/ContentsFormatsItems'
+      description: >-
+        Array of content formats to return. All included formats are returned in the response. Include "metadata" to get
+        JSON-LD and OpenGraph information, if available.
+      title: ContentsFormats
+    ContentsMetadata:
+      type: object
+      properties:
+        site_name:
+          type:
+            - string
+            - 'null'
+          description: The OpenGraph site name of the web page.
+        favicon_url:
+          type: string
+          description: The URL of the favicon of the web page's domain.
+      description: Metadata about the web page. Only returned when 'metadata' is included in the formats array.
+      title: ContentsMetadata
+    V1ContentsPostResponsesContentApplicationJsonSchemaItems:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+          description: The webpage URL whose content has been fetched.
+        title:
+          type: string
+          description: The title of the web page.
+        html:
+          type:
+            - string
+            - 'null'
+          description: The retrieved HTML content of the web page.
+        markdown:
+          type:
+            - string
+            - 'null'
+          description: The retrieved Markdown content of the web page.
+        metadata:
+          $ref: '#/components/schemas/ContentsMetadata'
+      title: V1ContentsPostResponsesContentApplicationJsonSchemaItems
+    ContentsRequestUnauthorizedError:
+      type: object
+      properties:
+        detail:
+          type: string
+          description: Error detail message.
+      title: ContentsRequestUnauthorizedError
+    ContentsRequestForbiddenError:
+      type: object
+      properties:
+        detail:
+          type: string
+      title: ContentsRequestForbiddenError
+    ContentsRequestInternalServerError:
+      type: object
+      properties:
+        detail:
+          type: string
+      title: ContentsRequestInternalServerError
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: >-
+        A unique API Key is required to authorize API access. [Get your API Key with free
+        credits](https://you.com/platform).

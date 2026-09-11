@@ -1,0 +1,791 @@
+openapi: 3.1.0
+info:
+  title: Research
+  version: 1.0.0
+paths:
+  /v1/research:
+    post:
+      operationId: research
+      summary: Returns comprehensive research-grade answers with multi-step reasoning
+      description: >-
+        Research goes beyond a single web search. In response to your question, it runs multiple searches, reads through
+        the sources, and synthesizes everything into a thorough, well-cited answer. Use it when a question is too
+        complex for a simple lookup, and when you need a response you can actually trust and verify.
+      parameters:
+        - name: X-API-Key
+          in: header
+          description: >-
+            A unique API Key is required to authorize API access. [Get your API Key with free
+            credits](https://you.com/platform).
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: >-
+            In synchronous mode (`background: false`, the default), a JSON object containing a comprehensive answer with
+            citations and supporting search results. In background mode (`background: true`), a JSON object with a task
+            handle that you can poll or stream for the final result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/research_Response_200'
+        '401':
+          description: Unauthorized. Problems with API key.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResearchRequestUnauthorizedError'
+        '403':
+          description: Forbidden. API key lacks scope for this path.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResearchRequestForbiddenError'
+        '422':
+          description: Unprocessable Entity. Request validation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResearchRequestUnprocessableEntityError'
+        '500':
+          description: Internal Server Error during authentication/authorization middleware.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResearchRequestInternalServerError'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                input:
+                  type: string
+                  maxLength: 40000
+                  description: |-
+                    The research question or complex query requiring in-depth investigation and multi-step reasoning.
+
+                    Note: The maximum length of the input is 40,000 characters.
+                research_effort:
+                  $ref: '#/components/schemas/V1ResearchPostRequestBodyContentApplicationJsonSchemaResearchEffort'
+                  default: standard
+                  description: >-
+                    Controls how much time and effort the Research API spends on your question. Higher effort levels run
+                    more searches and dig deeper into sources, at the cost of a longer response time.
+
+
+                    Available levels:
+
+                    - `lite`: Returns answers quickly. Good for straightforward questions that just need a fast,
+                    reliable answer.
+
+                    - `standard`: The default. Balances speed and depth, a good fit for most questions.
+
+                    - `deep`: Spends more time researching and cross-referencing sources. Use this when accuracy and
+                    thoroughness matter more than speed.
+
+                    - `exhaustive`: The most thorough option. Explores the topic as fully as possible, best suited for
+                    complex research tasks where you want the highest quality result.
+
+                    - `frontier`: Designed for long-running, deep research tasks that require the maximum compute
+                    budget. Latency ranges from 30s to 12000s (p50: 300s). Requires `background: true` — synchronous
+                    requests with `research_effort: "frontier"` return `422`.
+                source_control:
+                  $ref: '#/components/schemas/V1ResearchPostRequestBodyContentApplicationJsonSchemaSourceControl'
+                  description: >-
+                    Beta. Controls which web sources the research agent searches and visits. Use this to allow specific
+                    domains, block specific domains, boost specific domains, filter by recency, or focus web results by
+                    country.
+
+
+                    `include_domains` and `exclude_domains` cannot be used together in the same request. Each domain
+                    list is capped at 500 entries. `exclude_domains` also blocks the research agent from visiting pages
+                    on those domains during browsing. `boost_domains` gives matching domains a relative ranking boost
+                    without filtering out other domains. It can be combined with `exclude_domains` but cannot be
+                    combined with `include_domains` (returns `422`).
+                output_schema:
+                  type: object
+                  additionalProperties:
+                    description: Any type
+                  description: >-
+                    Beta. Requests structured JSON output in `output.content` using a supported JSON Schema subset.
+                    Supported with `research_effort` values `standard`, `deep`, `exhaustive`, and `frontier`. Sending
+                    `output_schema` with `research_effort: "lite"` returns `422`.
+
+
+                    Limits are enforced before model execution. The request fails with `422` if any limit is exceeded:
+
+                    - Max nesting depth: 5. - Max total properties: 100. - Max total enum values: 500. - Max large-enum
+                    string budget (enums over 250 values): 7,500. - Max total schema string budget: 25,000. The schema
+                    string budget counts property names, `$defs` names, enum values, and `const` values.
+
+
+                    Schema rules:
+
+                    - Root must be a JSON object. Top-level `anyOf` is not allowed. - Every object must define
+                    `properties` and set `additionalProperties: false`. - Every property must be listed in `required`.
+                    To make a field optional, keep it in `required` and add `"null"` to its type, for example
+                    `["string", "null"]`. - Recursive schemas are not supported. - A property's type may not be a bare
+                    `{"type": "null"}`. Use a nullable array form such as `["string", "null"]`, or a `null` branch
+                    inside an `anyOf`.
+
+
+                    See [Structured Output](/docs/guides/research#structured-output) for full rules, supported patterns,
+                    the optional-via-nullable pattern, conditional structure, and examples.
+                background:
+                  type: boolean
+                  default: false
+                  description: >-
+                    When `true`, runs the request asynchronously as a background task. The API returns a task handle
+                    immediately instead of waiting for the final answer. Poll `GET /v1/research/{task_id}` or stream
+                    progress via `GET /v1/research/{task_id}/stream` to retrieve the result. Useful for `deep` or
+                    `exhaustive` research that can exceed client-side timeouts, or when you want to decouple submission
+                    from retrieval. Required for `research_effort: "frontier"`.
+              required:
+                - input
+  /v1/research/{task_id}:
+    get:
+      operationId: getResearchTask
+      summary: Get the status or result of a background research task
+      description: >-
+        Retrieve the current status of a background research task. While the task is in progress, the `result` field is
+        `null`. Once the task reaches `completed`, the full research result is returned in `result`. If the task fails,
+        `status` is `failed` and `error` contains a diagnostic message.
+      parameters:
+        - name: task_id
+          in: path
+          description: The unique identifier of the background research task.
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: X-API-Key
+          in: header
+          description: >-
+            A unique API Key is required to authorize API access. [Get your API Key with free
+            credits](https://you.com/platform).
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The current status and, if completed, the result of the task.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResearchTaskDetail'
+        '401':
+          description: Unauthorized. Problems with API key.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetResearchTaskRequestUnauthorizedError'
+        '403':
+          description: Forbidden. The API key is not authorized to access this task.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetResearchTaskRequestForbiddenError'
+        '404':
+          description: Not found. The task ID does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetResearchTaskRequestNotFoundError'
+        '500':
+          description: Internal Server Error during authentication/authorization middleware.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetResearchTaskRequestInternalServerError'
+  /v1/research/{task_id}/stream:
+    get:
+      operationId: streamResearchTask
+      summary: Stream progress for a background research task
+      description: >-
+        Stream real-time progress for a background research task using Server-Sent Events (SSE). The stream starts with
+        a `connected` event, followed by periodic ping comments to keep the connection alive, and closes when the task
+        reaches a terminal status (`completed`, `failed`, or `cancelled`), at which point a terminal event matching the
+        status name is sent. To replay events after reconnecting, pass `?from_id=N` with the last event ID you received.
+        After the stream closes, call `GET /v1/research/{task_id}` to retrieve the full `result` object.
+      parameters:
+        - name: task_id
+          in: path
+          description: The unique identifier of the background research task.
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: from_id
+          in: query
+          description: Optional event ID to replay events from after reconnecting.
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: X-API-Key
+          in: header
+          description: >-
+            A unique API Key is required to authorize API access. [Get your API Key with free
+            credits](https://you.com/platform).
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A Server-Sent Events stream of task progress updates.
+          content:
+            text/event-stream:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized. Problems with API key.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StreamResearchTaskRequestUnauthorizedError'
+        '403':
+          description: Forbidden. The API key is not authorized to access this task.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StreamResearchTaskRequestForbiddenError'
+        '404':
+          description: Not found. The task ID does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StreamResearchTaskRequestNotFoundError'
+        '500':
+          description: Internal Server Error during authentication/authorization middleware.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StreamResearchTaskRequestInternalServerError'
+servers:
+  - url: https://api.you.com
+    description: Production
+components:
+  schemas:
+    V1ResearchPostRequestBodyContentApplicationJsonSchemaResearchEffort:
+      type: string
+      enum:
+        - lite
+        - standard
+        - deep
+        - exhaustive
+        - frontier
+      default: standard
+      description: >-
+        Controls how much time and effort the Research API spends on your question. Higher effort levels run more
+        searches and dig deeper into sources, at the cost of a longer response time.
+
+
+        Available levels:
+
+        - `lite`: Returns answers quickly. Good for straightforward questions that just need a fast, reliable answer.
+
+        - `standard`: The default. Balances speed and depth, a good fit for most questions.
+
+        - `deep`: Spends more time researching and cross-referencing sources. Use this when accuracy and thoroughness
+        matter more than speed.
+
+        - `exhaustive`: The most thorough option. Explores the topic as fully as possible, best suited for complex
+        research tasks where you want the highest quality result.
+
+        - `frontier`: Designed for long-running, deep research tasks that require the maximum compute budget. Latency
+        ranges from 30s to 12000s (p50: 300s). Requires `background: true` — synchronous requests with `research_effort:
+        "frontier"` return `422`.
+      title: V1ResearchPostRequestBodyContentApplicationJsonSchemaResearchEffort
+    IncludeDomains:
+      type: array
+      items:
+        type: string
+      description: >-
+        A list of domains to restrict search results to. Only results from these domains will be returned. Supports up
+        to 500 domains. This is a strict allowlist, not a boost — results are limited exclusively to the specified
+        domains.
+
+
+        Cannot be combined with `exclude_domains`; passing both will return a `422` error.
+      title: IncludeDomains
+    ExcludeDomains:
+      type: array
+      items:
+        type: string
+      description: >-
+        A list of domains to exclude from search results. Results from these domains will be filtered out. Supports up
+        to 500 domains.
+
+
+        Cannot be combined with `include_domains`; passing both will return a `422` error.
+      title: ExcludeDomains
+    BoostDomains:
+      type: array
+      items:
+        type: string
+      description: >-
+        A list of domains to boost in search ranking. Matching results from these domains receive a fixed relative
+        ranking boost, but this is not a filter. If the boosted domains do not have matching results, results from other
+        domains can still appear. Supports up to 500 domains. Boosted domains are not guaranteed to appear in the final
+        answer — the research agent may still select other sources if they are a better fit for the response.
+
+
+        Can be combined with `exclude_domains`. Cannot be combined with `include_domains`. Passing both `boost_domains`
+        and `include_domains` will return a `422` error.
+      title: BoostDomains
+    Freshness:
+      type: string
+      enum:
+        - day
+        - week
+        - month
+        - year
+      title: Freshness
+    FreshnessValue:
+      oneOf:
+        - $ref: '#/components/schemas/Freshness'
+        - type: string
+      description: >-
+        Specifies the freshness of the results to return. Provide either one of `day`, `week`, `month`, `year`, or a
+        date range string in the format `YYYY-MM-DDtoYYYY-MM-DD`.
+
+
+        When your search query includes a temporal keyword and you also set a freshness parameter, the search will use
+        the broader (i.e., less restrictive) of the two timeframes. For example, if you use
+        `query=news+this+week&freshness=month`, the results will use a freshness of month.
+      title: FreshnessValue
+    Country:
+      type: string
+      enum:
+        - AR
+        - AU
+        - AT
+        - BE
+        - BR
+        - CA
+        - CL
+        - DK
+        - FI
+        - FR
+        - DE
+        - HK
+        - IN
+        - ID
+        - IT
+        - JP
+        - KR
+        - MY
+        - MX
+        - NL
+        - NZ
+        - 'NO'
+        - CN
+        - PL
+        - PT
+        - PH
+        - RU
+        - SA
+        - ZA
+        - ES
+        - SE
+        - CH
+        - TW
+        - TR
+        - GB
+        - US
+      description: The country code that determines the geographical focus of the web results.
+      title: Country
+    V1ResearchPostRequestBodyContentApplicationJsonSchemaSourceControl:
+      type: object
+      properties:
+        include_domains:
+          $ref: '#/components/schemas/IncludeDomains'
+        exclude_domains:
+          $ref: '#/components/schemas/ExcludeDomains'
+        boost_domains:
+          $ref: '#/components/schemas/BoostDomains'
+        freshness:
+          $ref: '#/components/schemas/FreshnessValue'
+        country:
+          $ref: '#/components/schemas/Country'
+      description: >-
+        Beta. Controls which web sources the research agent searches and visits. Use this to allow specific domains,
+        block specific domains, boost specific domains, filter by recency, or focus web results by country.
+
+
+        `include_domains` and `exclude_domains` cannot be used together in the same request. Each domain list is capped
+        at 500 entries. `exclude_domains` also blocks the research agent from visiting pages on those domains during
+        browsing. `boost_domains` gives matching domains a relative ranking boost without filtering out other domains.
+        It can be combined with `exclude_domains` but cannot be combined with `include_domains` (returns `422`).
+      title: V1ResearchPostRequestBodyContentApplicationJsonSchemaSourceControl
+    ResearchOutputOutputContent:
+      oneOf:
+        - type: string
+        - type: object
+          additionalProperties:
+            description: Any type
+      description: >-
+        The comprehensive response with inline citations. By default, content is a Markdown string with numbered
+        citations that reference the items in the sources array. When `output_schema` is provided, content is a JSON
+        object that conforms to the requested schema.
+      title: ResearchOutputOutputContent
+    ResearchOutputOutputContentType:
+      type: string
+      enum:
+        - text
+        - object
+      description: The format of the content field.
+      title: ResearchOutputOutputContentType
+    ResearchOutputOutputSourcesItems:
+      type: object
+      properties:
+        url:
+          type: string
+          description: The URL of the source webpage.
+        title:
+          type: string
+          description: The title of the source webpage.
+        snippets:
+          type: array
+          items:
+            type: string
+          description: Relevant excerpts from the source page that were used in generating the answer.
+      required:
+        - url
+      title: ResearchOutputOutputSourcesItems
+    ResearchOutputOutput:
+      type: object
+      properties:
+        content:
+          $ref: '#/components/schemas/ResearchOutputOutputContent'
+          description: >-
+            The comprehensive response with inline citations. By default, content is a Markdown string with numbered
+            citations that reference the items in the sources array. When `output_schema` is provided, content is a JSON
+            object that conforms to the requested schema.
+        content_type:
+          $ref: '#/components/schemas/ResearchOutputOutputContentType'
+          description: The format of the content field.
+        sources:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResearchOutputOutputSourcesItems'
+          description: A list of web sources used to generate the answer.
+      required:
+        - content
+        - content_type
+        - sources
+      description: An object containing the content, content type, and source list.
+      title: ResearchOutputOutput
+    ResearchOutput:
+      type: object
+      properties:
+        output:
+          $ref: '#/components/schemas/ResearchOutputOutput'
+          description: An object containing the content, content type, and source list.
+        warnings:
+          type: array
+          items:
+            type: string
+          description: >-
+            A list of warnings generated during research, such as source access issues or partial results. Empty when no
+            warnings occurred.
+      required:
+        - output
+        - warnings
+      description: The research output containing the answer and sources.
+      title: ResearchOutput
+    ResearchTaskType:
+      type: string
+      enum:
+        - research
+      description: The task type.
+      title: ResearchTaskType
+    ResearchTaskStatus:
+      type: string
+      enum:
+        - queued
+        - running
+        - completed
+        - failed
+        - cancelled
+      description: The status of a background research task.
+      title: ResearchTaskStatus
+    ResearchTask:
+      type: object
+      properties:
+        task_id:
+          type: string
+          format: uuid
+          description: Unique identifier for the background research task.
+        type:
+          $ref: '#/components/schemas/ResearchTaskType'
+          description: The task type.
+        status:
+          $ref: '#/components/schemas/ResearchTaskStatus'
+        stream_url:
+          type: string
+          description: The URL path for the Server-Sent Events stream for this task.
+        created_at:
+          type: string
+          format: date-time
+          description: When the task was created, in RFC 3339 format.
+      required:
+        - task_id
+        - type
+        - status
+        - stream_url
+        - created_at
+      description: A handle for a background research task returned immediately on submission.
+      title: ResearchTask
+    research_Response_200:
+      oneOf:
+        - $ref: '#/components/schemas/ResearchOutput'
+        - $ref: '#/components/schemas/ResearchTask'
+      title: research_Response_200
+    ResearchRequestUnauthorizedError:
+      type: object
+      properties:
+        detail:
+          type: string
+          description: Error detail message.
+      title: ResearchRequestUnauthorizedError
+    ResearchRequestForbiddenError:
+      type: object
+      properties:
+        detail:
+          type: string
+      title: ResearchRequestForbiddenError
+    V1ResearchPostResponsesContentApplicationJsonSchemaDetailItemsLocItems:
+      oneOf:
+        - type: string
+        - type: integer
+      title: V1ResearchPostResponsesContentApplicationJsonSchemaDetailItemsLocItems
+    V1ResearchPostResponsesContentApplicationJsonSchemaDetailItemsInput:
+      oneOf:
+        - type: string
+        - type: object
+          additionalProperties:
+            description: Any type
+      description: The input value that caused the error.
+      title: V1ResearchPostResponsesContentApplicationJsonSchemaDetailItemsInput
+    V1ResearchPostResponsesContentApplicationJsonSchemaDetailItems:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The validation error type.
+        loc:
+          type: array
+          items:
+            $ref: '#/components/schemas/V1ResearchPostResponsesContentApplicationJsonSchemaDetailItemsLocItems'
+          description: The location of the error as a path of segments (strings for field names, integers for byte offsets).
+        msg:
+          type: string
+          description: A human-readable description of the error.
+        input:
+          $ref: '#/components/schemas/V1ResearchPostResponsesContentApplicationJsonSchemaDetailItemsInput'
+          description: The input value that caused the error.
+        ctx:
+          type: object
+          additionalProperties:
+            description: Any type
+          description: Additional context about the error.
+      required:
+        - type
+        - loc
+        - msg
+        - input
+      title: V1ResearchPostResponsesContentApplicationJsonSchemaDetailItems
+    ResearchRequestUnprocessableEntityError:
+      type: object
+      properties:
+        detail:
+          type: array
+          items:
+            $ref: '#/components/schemas/V1ResearchPostResponsesContentApplicationJsonSchemaDetailItems'
+      title: ResearchRequestUnprocessableEntityError
+    ResearchRequestInternalServerError:
+      type: object
+      properties:
+        detail:
+          type: string
+      title: ResearchRequestInternalServerError
+    ResearchTaskDetailTaskType:
+      type: string
+      enum:
+        - research
+      description: The task type.
+      title: ResearchTaskDetailTaskType
+    ResearchTaskInputResearchEffort:
+      type: string
+      enum:
+        - lite
+        - standard
+        - deep
+        - exhaustive
+        - frontier
+      description: The research effort level that was submitted.
+      title: ResearchTaskInputResearchEffort
+    ResearchTaskInputSourceControl:
+      type: object
+      properties: {}
+      description: The source control configuration that was submitted, if any.
+      title: ResearchTaskInputSourceControl
+    ResearchTaskInputType:
+      type: string
+      enum:
+        - research
+      description: The task type.
+      title: ResearchTaskInputType
+    ResearchTaskInput:
+      type: object
+      properties:
+        input:
+          type: string
+          description: The research question that was submitted.
+        research_effort:
+          $ref: '#/components/schemas/ResearchTaskInputResearchEffort'
+          description: The research effort level that was submitted.
+        background:
+          type: boolean
+          description: Whether background mode was requested.
+        output_schema:
+          type:
+            - object
+            - 'null'
+          additionalProperties:
+            description: Any type
+          description: The structured output schema that was submitted, if any.
+        source_control:
+          oneOf:
+            - $ref: '#/components/schemas/ResearchTaskInputSourceControl'
+            - type: 'null'
+          description: The source control configuration that was submitted, if any.
+        type:
+          $ref: '#/components/schemas/ResearchTaskInputType'
+          description: The task type.
+      required:
+        - input
+        - research_effort
+        - background
+        - output_schema
+        - source_control
+        - type
+      description: The original request parameters submitted for the background research task.
+      title: ResearchTaskInput
+    ResearchTaskDetail:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the background research task.
+        task_type:
+          $ref: '#/components/schemas/ResearchTaskDetailTaskType'
+          description: The task type.
+        status:
+          $ref: '#/components/schemas/ResearchTaskStatus'
+        created_at:
+          type: string
+          format: date-time
+          description: When the task was created, in RFC 3339 format.
+        updated_at:
+          type:
+            - string
+            - 'null'
+          format: date-time
+          description: When the task was last updated, in RFC 3339 format. `null` if the task has not yet started running.
+        completed_at:
+          type:
+            - string
+            - 'null'
+          format: date-time
+          description: >-
+            When the task reached a terminal status, in RFC 3339 format. `null` if the task has not yet completed,
+            failed, or been cancelled.
+        error:
+          type:
+            - string
+            - 'null'
+          description: A diagnostic message when `status` is `failed`. `null` for all other statuses.
+        input:
+          $ref: '#/components/schemas/ResearchTaskInput'
+        result:
+          oneOf:
+            - $ref: '#/components/schemas/ResearchOutput'
+            - type: 'null'
+          description: The final research result when `status` is `completed`. `null` while the task is queued or running.
+      required:
+        - id
+        - task_type
+        - status
+        - created_at
+        - updated_at
+        - completed_at
+        - error
+        - input
+        - result
+      description: >-
+        The full state of a background research task, including status, metadata, the original request input, and the
+        final result once complete.
+      title: ResearchTaskDetail
+    GetResearchTaskRequestUnauthorizedError:
+      type: object
+      properties:
+        detail:
+          type: string
+          description: Error detail message.
+      title: GetResearchTaskRequestUnauthorizedError
+    GetResearchTaskRequestForbiddenError:
+      type: object
+      properties:
+        detail:
+          type: string
+      title: GetResearchTaskRequestForbiddenError
+    GetResearchTaskRequestNotFoundError:
+      type: object
+      properties:
+        detail:
+          type: string
+      title: GetResearchTaskRequestNotFoundError
+    GetResearchTaskRequestInternalServerError:
+      type: object
+      properties:
+        detail:
+          type: string
+      title: GetResearchTaskRequestInternalServerError
+    StreamResearchTaskRequestUnauthorizedError:
+      type: object
+      properties:
+        detail:
+          type: string
+          description: Error detail message.
+      title: StreamResearchTaskRequestUnauthorizedError
+    StreamResearchTaskRequestForbiddenError:
+      type: object
+      properties:
+        detail:
+          type: string
+      title: StreamResearchTaskRequestForbiddenError
+    StreamResearchTaskRequestNotFoundError:
+      type: object
+      properties:
+        detail:
+          type: string
+      title: StreamResearchTaskRequestNotFoundError
+    StreamResearchTaskRequestInternalServerError:
+      type: object
+      properties:
+        detail:
+          type: string
+      title: StreamResearchTaskRequestInternalServerError
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: >-
+        A unique API Key is required to authorize API access. [Get your API Key with free
+        credits](https://you.com/platform).

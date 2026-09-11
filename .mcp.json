@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "you-com-docs": {
+      "type": "http",
+      "url": "https://you.com/docs/_mcp/server"
+    },
+    "you-com": {
+      "type": "http",
+      "url": "https://api.you.com/mcp"
+    }
+  }
+}

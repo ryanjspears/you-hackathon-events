@@ -1,0 +1,128 @@
+openapi: 3.1.0
+info:
+  title: Billing
+  version: 1.0.0
+paths:
+  /v1/billing/account_balance:
+    get:
+      operationId: getAccountBalance
+      summary: Returns the current credit balance for the billing entity
+      description: >-
+        Returns the remaining credit balance for the billing entity associated with the API key used in the request.
+
+
+        The billing entity is determined by the account context:
+
+        - **Organization members** — the balance reflects the shared credit pool
+          for the entire organization (tenant).
+
+        - **Individual users** — the balance reflects the credits available on
+          the individual user account.
+
+
+        Balance values are expressed in cents, so a value of `718924.5` corresponds to **$7,189.24** in remaining
+        credits.
+      parameters:
+        - name: X-API-Key
+          in: header
+          description: >-
+            The unique API Key required to authorize API access. Learn how to get yours in the ["Get your API key"
+            section of the documentation](/docs/quickstart#get-your-api-key).
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A JSON object containing the credit balance for the billing entity associated with the API key.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getAccountBalance_Response_200'
+        '401':
+          description: Unauthorized. Problems with API key.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAccountBalanceRequestUnauthorizedError'
+        '403':
+          description: Forbidden. API key lacks scope for this path.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAccountBalanceRequestForbiddenError'
+        '500':
+          description: Internal Server Error during authentication/authorization middleware.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAccountBalanceRequestInternalServerError'
+servers:
+  - url: https://api.you.com
+    description: Production
+components:
+  schemas:
+    V1BillingAccountBalanceGetResponsesContentApplicationJsonSchemaDataAttributes:
+      type: object
+      properties:
+        balance:
+          type: number
+          format: double
+          description: >-
+            Remaining credit balance in cents. Divide by 100 to convert to USD. For example, `718924.5` equals
+            $7,189.24.
+      required:
+        - balance
+      title: V1BillingAccountBalanceGetResponsesContentApplicationJsonSchemaDataAttributes
+    V1BillingAccountBalanceGetResponsesContentApplicationJsonSchemaData:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The type of billing entity. Always `"account"`.
+        id:
+          type: string
+          description: >-
+            A hashed identifier for the billing entity (user or organization). This value is stable for the lifetime of
+            the entity.
+        attributes:
+          $ref: '#/components/schemas/V1BillingAccountBalanceGetResponsesContentApplicationJsonSchemaDataAttributes'
+      required:
+        - type
+        - id
+        - attributes
+      title: V1BillingAccountBalanceGetResponsesContentApplicationJsonSchemaData
+    getAccountBalance_Response_200:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/V1BillingAccountBalanceGetResponsesContentApplicationJsonSchemaData'
+      required:
+        - data
+      title: getAccountBalance_Response_200
+    GetAccountBalanceRequestUnauthorizedError:
+      type: object
+      properties:
+        detail:
+          type: string
+          description: Error detail message.
+      title: GetAccountBalanceRequestUnauthorizedError
+    GetAccountBalanceRequestForbiddenError:
+      type: object
+      properties:
+        detail:
+          type: string
+      title: GetAccountBalanceRequestForbiddenError
+    GetAccountBalanceRequestInternalServerError:
+      type: object
+      properties:
+        detail:
+          type: string
+      title: GetAccountBalanceRequestInternalServerError
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: >-
+        The unique API Key required to authorize API access. Learn how to get yours in the ["Get your API key" section
+        of the documentation](/docs/quickstart#get-your-api-key).

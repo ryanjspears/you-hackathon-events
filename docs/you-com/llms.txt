@@ -1,0 +1,106 @@
+# You.com | Documentation
+
+> Web Search, Contents, and Research APIs that give your AI app real-time web intelligence. Start with free credits.
+
+## Instructions for AI Agents
+
+- For clean Markdown of any page, append `.md` to the page URL
+- For section-specific indexes, append `/llms.txt` to any section URL
+- For AI client integration (Claude Code, Cursor, etc.), connect to the MCP server at https://you.com/docs/_mcp/server
+- To pick the right You.com API, MCP server, SDK, or integration for a task, call the `you-discover` MCP tool on https://api.you.com/mcp instead of guessing from this index. It returns the recommended integration path. The `you-discover` agent skill below wraps the same tool for agents that install skills rather than call MCP directly.
+
+## Docs
+
+- [Build agentic apps with real-time web intelligence.](https://you.com/docs/welcome.md): Web Search, Contents, and Research APIs that give your AI app real-time web intelligence. Start with free credits—no credit card required.
+- [Quickstart](https://you.com/docs/quickstart.md): Get from zero to working API requests in minutes. Covers the Web Search API, Answer API, Contents API, Research API, Finance Research API, full page extraction, evaluation, and pricing—everything you need to evaluate You.com.
+- [Rate Limits](https://you.com/docs/rate-limits.md): Rate limit headers, the 429 response, Retry-After, and exponential backoff for the You.com APIs.
+- [Web Search API Overview](https://you.com/docs/guides/search.md): Get structured, LLM-optimized search results from web and news sources. Perfect for AI agents, RAG applications, and real-time information retrieval.
+- [Contents API Overview](https://you.com/docs/guides/contents.md): Extract clean HTML or Markdown content from any webpage on demand. Perfect for competitive intelligence, knowledge base ingestion, and web scraping without the mess.
+- [Answer API Overview](https://you.com/docs/guides/answer.md): Get a synthesized natural-language answer with inline citations from a single query. Control freshness, locale, domains, and explicit-content filtering without configuring research effort.
+- [Research API Overview](https://you.com/docs/guides/research.md): Get thorough, well-cited answers to complex questions. The Research API runs multiple searches, reads through sources, and returns Markdown or structured JSON with citations.
+- [Finance Research API Overview](https://you.com/docs/guides/finance-research.md): Get thorough, well-cited answers to financial questions. The Finance Research API uses a finance-optimized index to research earnings, filings, market data, and more—at the same price and latency as the Research API.
+- [Get live news](https://you.com/docs/guides/live-news.md): Retrieve real-time news results from the You.com Web Search API. Filter by recency, country, language, and more.
+- [Retrieve page content](https://you.com/docs/guides/retrieve-page-content.md): Extract full HTML or Markdown page content from search results. Ideal for RAG, knowledge base construction, and deep content analysis.
+- [Search operators](https://you.com/docs/guides/search-operators.md): Discover the search operators and learn how to use them
+- [How to Evaluate You.com Web Search API](https://you.com/docs/guides/evaluate-us.md): A practical guide to benchmarking You.com's Web Search API: methodology, configurations, datasets, and real performance tradeoffs.
+- [The Best Web Search API for AI Agents](https://you.com/docs/capabilities/web-search-api-for-ai-agents.md): The You.com Web Search API is built for AI agents, assistants, coding copilots, and RAG pipelines. Structured snippets, real-time web, one endpoint.
+- [MCP Server for Web Search](https://you.com/docs/capabilities/mcp-server-for-web-search.md): Add real-time web search to Claude, Cursor, and any MCP-compatible client with the You.com MCP server. One-line install, structured results, no scraping.
+- [The Best API for Grounding LLM Responses with Citations](https://you.com/docs/capabilities/grounding-llm-responses-with-citations.md): Add citations and real-time source grounding to any LLM with the You.com Web Search API. Step-by-step guide with code, schema, and production patterns.
+- [Account](https://you.com/docs/administration/account.md): Learn how to create, manage, and configure your You.com API account, including profile settings, email and password management.
+- [Billing](https://you.com/docs/administration/billing.md): Manage your You.com billing, view usage and credits, add funds, and handle payment methods.
+- [API Keys](https://you.com/docs/administration/api-keys.md): Learn how to create, manage, rotate, and secure your You.com API keys.
+- [Team Management](https://you.com/docs/administration/team-management.md): Invite teammates to your You.com organization and control what they can access with roles.
+- [Zero Data Retention (ZDR)](https://you.com/docs/administration/zero-data-retention.md): Restrict retention of request and response content on the You.com Web Search API and Answer API.
+- [Machine Payments](https://you.com/docs/administration/machine-payments.md): You.com accepts x402 and MPP machine payments for the Web Search and Finance Research APIs. Agents pay per request in USDC inside the same HTTP exchange.
+- [x402](https://you.com/docs/administration/machine-payments/x402.md): Call the You.com Web Search and Finance Research APIs with no API key and pay per request in USDC on Base or Solana using the x402 protocol.
+- [MPP](https://you.com/docs/administration/machine-payments/mpp.md): Call the You.com Web Search and Finance Research APIs with no API key and pay per request using the Machine Payments Protocol, settling in USDC on Tempo.
+- [Nevermined](https://you.com/docs/administration/machine-payments/nevermined.md): You.com accepts x402 agentic payments via Nevermined as one option for purchasing an API key.
+- [Examples](https://you.com/docs/examples.md): Explore real-world use cases powered by You.com APIs.
+- [Simple Search](https://you.com/docs/examples/simple-search.md): Your first API call in 2 minutes—fetch real-time web results in under 20 lines.
+- [Deep Search](https://you.com/docs/examples/deep-search.md): Multi-pass query expansion that surfaces sources a single search would miss.
+- [Research Agent](https://you.com/docs/examples/research.md): A multi-step agent that plans, searches, reads, and writes a cited report.
+- [Biomedical Research Brief](https://you.com/docs/examples/biomedical-research.md): Use the Research API to assemble a cited brief on any drug, target, or disease.
+- [Contents Extraction](https://you.com/docs/examples/contents.md): Pull clean Markdown or HTML from any URL—ideal for LLM ingestion.
+- [Deep Research Example](https://you.com/docs/examples/deep-research.md): A copy-and-customize research pattern for multi-source synthesis with citations preserved. Installable version: the you-research skill.
+- [Competitive Intel Example](https://you.com/docs/examples/competitive-intel.md): A copy-and-customize pattern that turns company or market research into a structured brief.
+- [News & Events Example](https://you.com/docs/examples/news-events.md): A copy-and-customize pattern for recent, time-bounded, cited retrieval.
+- [Fact Check Example](https://you.com/docs/examples/fact-check.md): A copy-and-customize pattern that checks a claim against supporting and contradicting evidence.
+- [Financial Research Example](https://you.com/docs/examples/financial-research.md): A copy-and-customize pattern for filings, fundamentals, market data, and ticker comparisons. Installable version: the you-finance skill.
+- [Research Recipe Example](https://you.com/docs/examples/research-recipe.md): A copy-and-customize template for composing You.com research workflows.
+- [SDKs & tools overview](https://you.com/docs/integrations-overview.md): You.com meets your agents wherever they run—MCP clients, Python and TypeScript codebases, agent skills and plugins, and the major agent frameworks.
+- [MCP Server](https://you.com/docs/build-with-agents/mcp-server.md): Integrate You.com's powerful web access capabilities into your agentic IDE using the Model Context Protocol (MCP). Search, extract content, research, and get finance-grade answers. Quick setup for Claude Code, Cursor, VS Code, and more.
+- [Docs MCP Server](https://you.com/docs/build-with-agents/docs-mcp-server.md): Give any MCP-enabled agent a searchDocs tool that searches all of You.com's developer documentation—API references, guides, and code examples—in real time. No API key.
+- [Agent Skills](https://you.com/docs/build-with-agents/skills.md): Install You.com agent skills for current web search, URL content extraction, cited research, finance research, and integration discovery.
+- [Codex CLI](https://you.com/docs/build-with-agents/agent-harnesses/codex-cli.md): Give Codex CLI real-time web search, content extraction, and citation-backed research through the You.com MCP Server. Free tier with no signup.
+- [Claude Code](https://you.com/docs/build-with-agents/agent-harnesses/claude-code.md): Give Claude Code real-time web search, content extraction, and citation-backed research through the You.com MCP Server. OAuth 2.1 or free tier.
+- [Cursor](https://you.com/docs/build-with-agents/agent-harnesses/cursor.md): Give Cursor real-time web search, content extraction, and citation-backed research through the You.com MCP Server. One-click install or manual config.
+- [OpenCode](https://you.com/docs/build-with-agents/agent-harnesses/opencode.md): Give OpenCode real-time web search, content extraction, and citation-backed research through the You.com MCP Server. Free tier with no signup.
+- [Windsurf](https://you.com/docs/build-with-agents/agent-harnesses/windsurf.md): Give Windsurf's Cascade agent real-time web search, content extraction, and citation-backed research through the You.com MCP Server.
+- [Gemini CLI](https://you.com/docs/build-with-agents/agent-harnesses/gemini-cli.md): Give Gemini CLI real-time web search, content extraction, and citation-backed research through the You.com MCP Server. Free tier with no signup.
+- [VS Code](https://you.com/docs/build-with-agents/agent-harnesses/vscode.md): Give GitHub Copilot's agent mode real-time web search, content extraction, and citation-backed research through the You.com MCP Server.
+- [JetBrains IDEs](https://you.com/docs/build-with-agents/agent-harnesses/jetbrains.md): Give AI Assistant and Junie real-time web search, content extraction, and citation-backed research through the You.com MCP Server.
+- [Zed](https://you.com/docs/build-with-agents/agent-harnesses/zed.md): Give Zed's AI assistant real-time web search, content extraction, and citation-backed research through the You.com MCP Server. Free tier with no signup.
+- [Pi](https://you.com/docs/build-with-agents/agent-harnesses/pi.md): Give Pi real-time web search and content extraction through the You.com agent skills. Free tier with no signup.
+- [Cecli](https://you.com/docs/build-with-agents/agent-harnesses/cecli.md): Give Cecli real-time web search, content extraction, and citation-backed research through the You.com MCP Server. Free tier with no signup.
+- [Factory Droid](https://you.com/docs/build-with-agents/agent-harnesses/factory-droid.md): Give Factory Droid real-time web search, content extraction, and citation-backed research through the You.com MCP Server. OAuth 2.1, API key, or free tier.
+- [Python SDK](https://you.com/docs/sdks/python-sdk.md): Official Python SDK for You.com's Web Search, Answer, Contents, Research, and Finance Research APIs. Simple, predictable API access with type hints and async support—get started in minutes.
+- [TypeScript SDK](https://you.com/docs/sdks/typescript-sdk.md): Official TypeScript SDK for You.com's Web Search, Contents, and Research APIs. Fully typed, simple to use—get started in minutes.
+- [Integrations](https://you.com/docs/integrations.md): Connect You.com's Web Search, Contents, and Research APIs to the AI frameworks, automation platforms, agent runtimes, and open models your agents already run on.
+- [Daytona](https://you.com/docs/integrations/daytona.md): Call the You.com Web Search, Contents, and Research APIs from inside Daytona sandboxes. You.com is on Daytona's essential-services allow list, with the API hosts and allow-list entries you need for a locked-down sandbox.
+- [crewAI](https://you.com/docs/integrations/crewai.md): Add real-time web search, research, and content extraction to crewAI agents through You.com's remote MCP server.
+- [LangChain](https://you.com/docs/integrations/langchain.md): Add real-time web search to LangChain agents and RAG pipelines using the langchain-youdotcom package.
+- [LangGraph](https://you.com/docs/integrations/langgraph.md): Build stateful AI agents with real-time web search and content extraction using LangGraph and the langchain-youdotcom package.
+- [Nevermined](https://you.com/docs/integrations/nevermined.md): You.com accepts x402 agentic payments via Nevermined as one option for purchasing an API key.
+- [n8n](https://you.com/docs/integrations/n8n.md): Add real-time web search, research, answer synthesis, and content extraction to n8n workflows with the official You.com n8n node.
+- [LlamaIndex](https://you.com/docs/integrations/llamaindex.md): Use You.com's Web Search API as a retriever in LlamaIndex applications with the llama-index-retrievers-you package.
+- [OpenAI GPT OSS](https://you.com/docs/integrations/gpt-oss.md): You.com powers the default web browsing backend for OpenAI's open-weight GPT OSS models. Use YouComBackend to give GPT OSS models real-time web access.
+- [Vercel AI SDK](https://you.com/docs/integrations/vercel-ai-sdk.md): Add real-time web search and webpage content extraction to Vercel AI SDK applications.
+- [Temporal](https://you.com/docs/integrations/temporal.md): Add durable You.com API activities to Temporal workflows with automatic retry, error mapping, and crash recovery.
+- [Zapier](https://you.com/docs/integrations/zapier.md): Connect You.com's Search, Content, and News APIs to 8,000+ apps in Zapier—no code required. Automate research, content, and data-collection workflows.
+- [Partnerships](https://you.com/docs/partnerships.md): You.com is available across MCP marketplaces, cloud marketplaces, AI frameworks, and developer tools.
+- [MCP Marketplaces](https://you.com/docs/partnerships/mcp-marketplaces.md): Find You.com MCP listings across Databricks Marketplace, the Anthropic MCP Registry, PulseMCP, Glama, MCP Market, Composio, and Warp.
+- [Cloud Marketplaces](https://you.com/docs/partnerships/cloud-marketplaces.md): Procure You.com Web Search, Research, and Finance Research APIs through AWS Marketplace and Microsoft Azure Marketplace.
+- [Framework and Tool Partners](https://you.com/docs/partnerships/framework-tool-partners.md): Explore You.com partner listings across OpenAI GPT OSS, LangChain, LangGraph, Zapier, Vercel AI SDK, Temporal, n8n, LlamaIndex, crewAI, LiteLLM, and more.
+- [Authentication](https://you.com/docs/using-the-api/authentication.md): How to authenticate requests to the You.com APIs with an API key, the X-API-Key header, and the YDC_API_KEY environment variable.
+- [Errors](https://you.com/docs/using-the-api/error-code-reference.md): Complete reference for You.com API errors and HTTP status codes. Understand 401, 402, 403, 404, 429, and 500 errors with causes and recommended actions.
+
+## Installable Agent Skills
+
+These live in the You.com open-source skills repo, not in these docs. They are installable instruction packs, distinct from the copy-and-customize example patterns listed under Docs above.
+
+- [Agent Skills repo](https://github.com/youdotcom-oss/agent-skills): Five installable You.com skills plus plugin packaging for Claude Code, GitHub Copilot CLI, Codex, Cursor, OpenCode, OpenClaw, Pi, and Hermes. Install every skill with `npx skills add youdotcom-oss/agent-skills`.
+- [you-web](https://github.com/youdotcom-oss/agent-skills/tree/main/skills/you-web): Use You.com MCP tools for current web search, URL content extraction, cited web synthesis, and x402-aware web access.
+- [you-free](https://github.com/youdotcom-oss/agent-skills/tree/main/skills/you-free): Use the free You.com MCP profile for unauthenticated basic web search with `you-search` only. No API key or OAuth required.
+- [you-research](https://github.com/youdotcom-oss/agent-skills/tree/main/skills/you-research): Route research tasks between a cost-conscious agentic search workflow, You.com Research API scripts, and managed or payment-aware MCP fallback.
+- [you-finance](https://github.com/youdotcom-oss/agent-skills/tree/main/skills/you-finance): Route finance questions to an existing local script, a new You.com Finance Research API call, or an MCP payment-aware fallback.
+- [you-discover](https://github.com/youdotcom-oss/agent-skills/tree/main/skills/you-discover): Route You.com integration planning through the you-discover MCP tool, AI Catalog entries, Docs MCP, and direct API options.
+
+## API Docs
+
+Per-endpoint reference pages are indexed at https://you.com/docs/api-reference/llms.txt. Fern generates that index directly from the OpenAPI specs, so it always reflects the current endpoint set. Fetch it for endpoint-level detail.
+
+## OpenAPI Specification
+
+The raw OpenAPI 3.1 specification for this API is available at:
+- [OpenAPI JSON](https://you.com/docs/openapi.json)
+- [OpenAPI YAML](https://you.com/docs/openapi.yaml)
