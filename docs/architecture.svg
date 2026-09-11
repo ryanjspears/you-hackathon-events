@@ -42,30 +42,19 @@
   <text x="110" y="264" class="t">event list, “I'm going”</text>
 
   <!-- FastAPI -->
-  <rect x="370" y="170" width="300" height="118" class="box" fill="#f1f5f9" stroke="#94a3b8"/>
-  <text x="390" y="200" class="h">FastAPI</text>
-  <text x="390" y="224" class="tm">GET /api/chat/stream (SSE)</text>
-  <text x="390" y="244" class="tm">POST /api/events/{id}/interact</text>
-  <text x="390" y="264" class="t">SQLite · one crew at a time</text>
+  <rect x="370" y="170" width="300" height="140" class="box" fill="#f1f5f9" stroke="#94a3b8"/>
+  <text x="390" y="200" class="h">API Gateway</text>
+  <text x="390" y="222" class="t">(FastAPI)</text>
+  <text x="390" y="248" class="tm">GET /api/chat/stream (SSE)</text>
+  <text x="390" y="268" class="tm">POST /api/events/{id}/interact</text>
+  <text x="390" y="288" class="t">SQLite · one crew at a time</text>
 
   <!-- CrewAI -->
-  <rect x="750" y="170" width="760" height="150" class="box" fill="#fff7ed" stroke="#f97316"/>
+  <rect x="750" y="170" width="760" height="140" class="box" fill="#fff7ed" stroke="#f97316"/>
   <text x="772" y="200" class="h">CrewAI crew</text>
-  <text x="900" y="200" class="t">three agents, sequential · LLM: OpenAI gpt-5.6-luna</text>
-  <rect x="772" y="220" width="220" height="80" rx="10" fill="#ffffff" stroke="#fdba74"/>
-  <text x="788" y="246" class="h2">1 · Planner</text>
-  <text x="788" y="268" class="t">message → SearchPlan</text>
-  <text x="788" y="288" class="t">city, dates, categories</text>
-  <rect x="1020" y="220" width="220" height="80" rx="10" fill="#ffffff" stroke="#fdba74"/>
-  <text x="1036" y="246" class="h2">2 · Scanner</text>
-  <text x="1036" y="268" class="t">runs scan.py in Daytona</text>
-  <text x="1036" y="288" class="t">repairs it if it crashes</text>
-  <rect x="1268" y="220" width="220" height="80" rx="10" fill="#ffffff" stroke="#fdba74"/>
-  <text x="1284" y="246" class="h2">3 · Curator</text>
-  <text x="1284" y="268" class="t">ranks the events</text>
-  <text x="1284" y="288" class="t">writes the reply</text>
-  <path d="M 992 260 L 1018 260" class="edge"/>
-  <path d="M 1240 260 L 1266 260" class="edge"/>
+  <text x="772" y="228" class="t">plans the search, runs scan.py in the Daytona sandbox, ranks the events and writes the reply</text>
+  <text x="772" y="250" class="t">repairs scan.py from the traceback if it crashes</text>
+  <text x="772" y="272" class="t">talks to the outside only through One</text>
 
   <!-- One -->
   <rect x="750" y="370" width="760" height="140" class="box" fill="#eef2ff" stroke="#4f46e5"/>
@@ -81,9 +70,9 @@
   <text x="300" y="216" class="lbl">HTTP + SSE</text>
   <path d="M 670 229 L 748 229" class="edge2"/>
   <text x="676" y="218" class="lbl">plan · events</text>
-  <path d="M 1130 320 L 1130 368" class="edge2"/>
+  <path d="M 1130 310 L 1130 368" class="edge2"/>
   <text x="1142" y="350" class="lbl">MCP tool calls (stdio)</text>
-  <path d="M 520 288 L 520 440 L 748 440" class="edge2"/>
+  <path d="M 520 310 L 520 440 L 748 440" class="edge2"/>
   <text x="535" y="430" class="lbl">one mem (CLI)</text>
 
   <!-- ===== CLOUD ZONE ===== -->
@@ -138,8 +127,6 @@
   <text x="1146" y="726" class="lbl" fill="#0f766e">extract</text>
 
   <!-- crew agents → OpenAI, routed down the right-hand margin -->
-  <path d="M 1400 320 L 1400 345 L 1525 345 L 1525 630 L 1345 630 L 1345 658" class="oai"/>
-  <text x="1410" y="338" class="lbl" fill="#0f766e">agent reasoning</text>
 
   <!-- legend -->
   <text x="470" y="880" class="zone">LEGEND</text>
