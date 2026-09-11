@@ -1,46 +1,56 @@
-# Hackathon plan — You.com
+# Hackathon plan — Build with YOU: The Live Web Agent Hackathon
 
-Drafted 2026-09-11 from `you-discover` results, the Docs MCP, and live smoke tests of the key.
+NYC, 2026-09-11. **Theme: self-repairing & learning agents.** Required vendors: **You.com, One, Daytona, CrewAI.** Sources: `docs/one-skill.md`, `docs/one-hackathon-page.md`, `docs/you-com/`, `docs/daytona/`.
 
-## What discovery established
+## Hard constraints (from the One skill — verified 2026-09-10)
 
-- **Key scope verified:** Search (0.6s), Answer (2.8s), Research `lite` (3.8s), Contents (0.5s) all return 200. Balance: $100.
-- **`you-discover` is an ARD catalog search** (GitHub + Hugging Face agent finders), not an ideation tool. It surfaces third-party MCP servers/skills; it does not surface You.com's own resources. Useful later if we need a non-You.com building block (e.g. a news-sentiment MCP), not for choosing the project.
-- **Smallest verified integration paths** (from Docs MCP + local mirror):
-  - TypeScript: `@youdotcom-oss/sdk` (Search, Contents, Research) + `@youdotcom-oss/ai-sdk-plugin` (`youSearch`, `youContents`, `youResearch` as Vercel AI SDK tools). Answer and Finance Research: plain `fetch`.
-  - Python: `youdotcom` SDK covers all five APIs.
-- **Differentiators worth building the demo around** (things a generic "chat with search" demo won't show):
-  1. **Answer API citations are verified against source text** — `citations[].excerpts` are the verbatim passages. Nobody else hands you receipts.
-  2. **Research API `background: true` + SSE stream** — progress events you can render live, plus `output_schema` for structured JSON.
-  3. **Finance Research API** — a separate finance-optimized index (filings, fundamentals).
-  4. **Search `extraction_mode: "full_page"`** — full Markdown per result in one call.
+- The **crew runs on the laptop**. It gets One's four tools via `npx -y @withone/mcp` (CrewAI `MCPServerAdapter`) and drives **You.com and Daytona through One**. Sandbox egress blocks `*.withone.ai`, so nothing One-driven can run *inside* a sandbox. `api.you.com` **is** reachable from inside a sandbox.
+- CrewAI needs **Python 3.10–3.13** locally (3.14 breaks). Pins: `crewai[anthropic]==1.15.2`, `crewai-tools[mcp]==1.15.2`, `mcp~=1.26.0`, `mcpadapt>=0.1.9,<0.2`. Apply the skill's `dropping_nulls` + `harden_execute` wrappers or tool calls fail.
+- Daytona default image ships Python 3.14; inside the sandbox use `uv python install 3.12` if a lib needs it. Always set `ttlMinutes` on create; pass `timeout` (seconds) on execute for anything slow (default 10s). Sandbox ids: `sandboxIdOrName` for lifecycle actions, `sandboxId` for in-sandbox actions.
+- Never hardcode One `actionId`s — resolve at runtime via `search_one_platform_actions`, read knowledge, then execute. GET `/v1/search` and POST share a title; pick by method.
+- `.env` for the crew: `ANTHROPIC_API_KEY`, `ONE_SECRET` (same key the CLI uses), `ONE_CONNECTION_KEYS=live::you::…,live::daytona::…,…`.
+- Learning: `one mem add note '{"content": …}' --tags … --weight N` after each run; `one mem search` before the next. First `one mem` call bootstraps embedded Postgres (~25s).
+- Demo convention judges expect: run twice; print `Recalled:` and `Learned:` lines so the second run visibly benefits.
 
-## Candidate projects
+## What "all four vendors" looks like in one loop
 
-| # | Idea | You.com APIs | Why it demos well | Risk |
-|---|------|--------------|-------------------|------|
-| **A** | **Receipts** — paste a tweet / article / paragraph; each factual claim gets an evidence card: supporting & contradicting verbatim excerpts, confidence, sources. | Answer (per claim), Search news mode (recency), Contents (primary source) | Uses the *verified excerpts* feature literally on screen; 2–3s per claim; ~$0.01 per claim; fits the official `fact-check` pattern. Universally understood in 10 seconds. | Claim extraction needs an LLM step (Claude); keep it to ≤6 claims per paste. |
-| B | **Live Research Console** — type a hard question, watch the research agent's progress stream in, get a cited report with a structured "key facts" sidebar. | Research (`deep`, background + SSE, `output_schema`) | Shows the flagship API's newest features; visually dramatic. | `deep` is <120s — long for a stage demo; use `standard` for demo, `deep` toggle. |
-| C | **Battlecard** — company or product name → one-page competitive brief (positioning, pricing, traction, recent moves) with pricing pulled live from their site. | Research + Contents (pricing page) + `output_schema` | Official `competitive-intel` pattern; structured JSON renders into a clean card. | Less novel; overlaps B. |
-| D | **Earnings Brief** — ticker → what moved, why, with filing citations. | Finance Research (`deep`) | Only API of its kind; judges may not have seen it. | $0.11/call, 30–120s latency; narrower audience. |
+```
+CrewAI crew (laptop)
+  ├─ Researcher ──One──▶ you: /v1/search, /v1/contents, /v1/research   (find facts / docs / changelogs)
+  ├─ Builder ─────One──▶ daytona: create sandbox, write files, execute, read exitCode+result
+  │        ◀── error ──┘  fix → execute again   (the self-repair loop)
+  ├─ Publisher ───One──▶ gmail / slack / github / notion / linear   (a real side effect)
+  └─ Memory ──────one mem add / one mem search   (the learning loop)
+```
 
-## Recommendation: A (Receipts), with B's streaming as a stretch goal
+## Candidate projects (all use the loop above)
 
-Reasoning: A is the only idea where You.com's specific advantage (verified excerpts) *is* the UI, not plumbing behind it. It's cheap, fast, and demoable on anyone's paste. If time remains, add a "Go deeper" button on any claim that fires Research in background mode and streams progress (B) — that shows two APIs without a second app.
+| # | Idea | Repair loop | Learning loop | Side effect | Stands out because |
+|---|------|-------------|---------------|-------------|--------------------|
+| **A** | **Dep Doctor** — point it at a repo; it upgrades outdated dependencies safely. Researcher pulls each package's changelog / migration guide / CVEs with You.com; Builder clones the repo into a sandbox, bumps versions, runs the tests, reads failures, patches, reruns. | Test failures → targeted fix (e.g. pydantic `.dict()`→`.model_dump()`) → rerun until green | Per-package fixes saved to `one mem`; on the next repo the Builder applies known migrations *before* running tests and reports `Recalled:` | Opens a GitHub PR via One with a changelog citing the You.com sources | Every judge has felt this pain; the "second repo upgrades first try" moment is a clean learning demo; ends in a real PR |
+| B | **Docs → Working Example** — give it a library + task ("use Temporal to schedule a job"); Contents API reads the docs, crew writes a runnable example, runs it in a sandbox, repairs until it exits 0. | Runtime error → re-read the relevant doc section via Contents → fix | Remembers per-library gotchas (env vars, version pins, Python 3.14 issues) | Pushes the example to a GitHub repo / gist; posts link to Slack | Shows You.com Contents doing something only it can do (clean Markdown of any docs page) |
+| C | **Issue Reproducer** — paste a GitHub issue URL; crew reads the issue and linked discussion (Contents + Search), writes a minimal repro in a sandbox, confirms it fails, tries candidate fixes, comments on the issue with the confirmed repro and a patch. | "Doesn't reproduce" → search for related issues/versions → adjust env → retry | Remembers which repro strategies worked per language/framework | Comments on the GitHub issue via One | Very "self-repairing"; maintainers would use it tomorrow |
+| D | **Benchmark Bot** — "is X faster than Y for Z?"; Research API finds candidate approaches, crew writes benchmark scripts, runs them in a sandbox, charts results, posts to Slack/Notion. | Script crashes / harness bugs → fix from stderr | Remembers harness fixes and which libraries need pins | Slack post with PNG + Notion page | Closest to template #1 (research→chart→email) but with a more useful question |
 
-### Stack
+## Recommendation: A (Dep Doctor)
 
-Next.js (App Router) + Vercel AI SDK + `@ai-sdk/anthropic` for claim extraction, `@youdotcom-oss/sdk` for Search/Contents, `fetch` for Answer. Deploy to Vercel. `YDC_API_KEY` + `ANTHROPIC_API_KEY` in `.env`.
+- **Clearest learning story.** Run 1 on `demo-repo-a`: pydantic 1→2 breaks tests, Builder repairs, `Learned: pydantic>=2 renames .dict()→.model_dump()`. Run 2 on `demo-repo-b` (same dep): `Recalled: …`, applies the fix pre-emptively, tests green on first execute. Judges see the difference in under a minute.
+- **Every vendor is load-bearing**, not decorative: You.com supplies the migration knowledge (Search + Contents on changelogs; Research for "what breaks when upgrading X from 1 to 2"), Daytona is the only safe place to run someone else's tests, One is the single interface to all of it plus GitHub, CrewAI orchestrates Researcher → Builder → Publisher.
+- **Scope-controllable.** Ship with two tiny demo repos whose breakages are known. Real-world repos are a stretch goal.
 
-### Build order (MVP first)
+### Build order
 
-1. `POST /api/claims` — Claude extracts ≤6 checkable claims from pasted text (structured output).
-2. `POST /api/verify` — for each claim, Answer API with `freshness` heuristic; map `citations[].excerpts` to support / contradict via a short Claude judgment; return confidence.
-3. UI: paste box → claim cards streaming in as each verifies; excerpt highlights; source favicons (`favicon_url` comes back from Search/Answer).
-4. Stretch: "Go deeper" → Research `background: true`, SSE progress in a drawer, final cited report.
-5. Stretch: news mode toggle for recency-sensitive claims (`results.news`).
+1. **Plumbing (do first, it's where time goes):** `one add you`, `one add daytona`, `one add github`; `one --agent list` and copy keys into `ONE_CONNECTION_KEYS`. Python 3.12 venv, pinned requirements, run the skill's CrewAI example once end-to-end to prove tools work.
+2. **Sandbox harness:** create (with `ttlMinutes`) → `git/clone` demo repo → install → run tests → parse `exitCode` + `result` → delete. Verify from the CLI before the crew touches it.
+3. **Researcher task:** for each outdated dep (parse `requirements.txt`/`package.json`), You.com Search for "`<pkg>` `<old>` to `<new>` migration guide breaking changes", Contents on the top hit, summarize the breaking changes with URLs.
+4. **Builder task:** bump, run tests, on failure feed error + Researcher notes to the LLM, patch via a `cat > file <<'EOF'` execute, rerun. Cap at N iterations.
+5. **Memory:** after success, `one mem add` `{package, from, to, symptom, fix}` with `--tags depdoctor,<pkg>`; at start, `one mem search "<pkg> <new version>"` and inject hits into the Builder's context. Print `Recalled:` / `Learned:`.
+6. **Publisher:** GitHub create-branch + commit + open PR via One, body cites the You.com sources.
+7. Demo repos: `demo-repo-a` (pydantic 1.x + requests pin), `demo-repo-b` (pydantic 1.x + a second known-breaking upgrade).
+8. Stretch: a small web UI or Slack post showing the run log; Relay trigger on "PR opened" so the loop runs unattended.
 
-### Open questions
+## Fallbacks
 
-- Actual hackathon theme / judging criteria (not found on you.com/resources/hackathon — it's a blog index).
-- Team size and time budget — B as stretch assumes >1 day.
+- If One↔Daytona is flaky on the day: the Builder can call Daytona's SDK directly (`pip install daytona`, `DAYTONA_API_KEY`) — still uses Daytona, One still covers You.com + GitHub.
+- If GitHub PR creation eats time: Publisher emails the diff via Gmail (the template pattern, known to work).
+- If Dep Doctor stalls on plumbing by early afternoon: pivot to B, which reuses everything except the git clone + test run.

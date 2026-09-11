@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Entry for **"Build with YOU: The Live Web Agent Hackathon"** (You.com, New York, 2026-09-11). Sponsors/tools in play: **You.com** APIs (web search, contents, cited answers/research), **One** (withone.ai — one MCP/CLI that acts on 780+ apps incl. You.com and Daytona), and **Daytona** (sandboxes for running agent-generated code). No application code exists yet; `PLAN.md` holds the candidate ideas. Update this file with build/test/run commands once they exist.
+Entry for **"Build with YOU: The Live Web Agent Hackathon"** (You.com, New York, 2026-09-11). **Theme: self-repairing & learning agents.** All four vendors must be used: **You.com** (web search / contents / research), **One** (withone.ai — one MCP/CLI over 780+ apps incl. You.com and Daytona), **Daytona** (sandboxes for running agent-generated code), **CrewAI** (orchestration). Reference architecture: a CrewAI crew on the laptop gets One's four tools via `npx -y @withone/mcp` and drives You.com + Daytona + a side-effect app (GitHub/Gmail/Slack) through One; learning via `one mem`. Sandboxes cannot reach `*.withone.ai`, so the crew never runs inside Daytona. `PLAN.md` has the chosen idea, constraints, and build order — read it first. Hackathon page saved at `docs/one-hackathon-page.md`. Update this file with build/test/run commands once code exists.
 
 Secrets live in `.env` (git-ignored): `YDC_API_KEY`, `DAYTONA_API_KEY`.
 
