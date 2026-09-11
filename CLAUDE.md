@@ -67,3 +67,15 @@ Auth: `DAYTONA_API_KEY` (dashboard: https://app.daytona.io/dashboard/keys). SDKs
 All need one-time approval in Claude Code (`/mcp`). Setup details: `docs/you-com/build-with-agents/agent-harnesses/claude-code.md`, `docs/one-skill.md`.
 
 The official **`you@you-com` plugin** (user-scoped, from marketplace `youdotcom-oss/agent-skills`) is also installed on this machine. It adds skills `you-web` (search / URL reads / cited synthesis), `you-research`, `you-finance`, `you-discover` (picks the right You.com API/SDK/integration for a task), `you-free`, and its own MCP servers `you` (same URL as `you-com` above), `you-finance`, `you-research`. Prefer those skills over raw tool calls. Onboarding skill source: `docs/you-com/skill.md` (from https://you.com/skill.md).
+
+## One CLI — Platform Integrations
+
+The One CLI (`one`) is installed and authenticated on this machine (account: 18rspears@gmail.com, `live` env, global config). It gives agents a single interface to 750+ third-party platforms (Gmail, Slack, GitHub, Notion, Stripe, You.com, Daytona, …). **Whenever you need to act on a third-party app or external service, use One** — never a raw HTTP call or a scraped page.
+
+- Always put `--agent` right after `one` for JSON output: `one --agent <command>`.
+- Workflow, every time, in order: `one --agent list` (get the connection key) → `one --agent actions search <platform> "<outcome>"` → `one --agent actions knowledge <platform> <actionId>` (REQUIRED before execute) → `one --agent actions execute <platform> <actionId> <connectionKey> [-d '<json>' | --query-params '<json>' | --path-vars '<json>']`.
+- Never invent an `actionId` or connection key; resolve them at run time. Omit optional params rather than sending `null`.
+- Confirm with the user before any write (send, create, update, delete, pay). Reads need no confirmation.
+- Before using flows or relay, read the bundled skill first: `one --agent guide flows` / `one --agent guide relay`. Full reference: `one --agent guide`.
+- Connect a new platform with `one add <platform>` (interactive, no `--agent` — the user must run it).
+- Gotcha: One's composite actions (paths like `/v1/gmail/get-emails`) list `connectionKey` as a required **body** field — include it in `-d` as well as the positional arg, or validation fails with "missing required parameters".
