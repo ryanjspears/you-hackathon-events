@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="790" viewBox="0 0 1600 790" font-family="Inter, Helvetica Neue, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/>
+    </marker>
+    <marker id="arrow-you" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7c3aed"/>
+    </marker>
+    <marker id="arrow-oai" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#0f766e"/>
+    </marker>
+    <style>
+      .title { font-size: 30px; font-weight: 700; fill: #0f172a; }
+      .zone  { font-size: 13px; font-weight: 700; letter-spacing: .12em; fill: #64748b; }
+      .h     { font-size: 20px; font-weight: 700; fill: #0f172a; text-anchor: middle; }
+      .h2    { font-size: 16px; font-weight: 600; fill: #0f172a; text-anchor: middle; }
+      .t     { font-size: 14px; fill: #475569; text-anchor: middle; }
+      .edge  { stroke: #475569; stroke-width: 2.2; fill: none; marker-end: url(#arrow); }
+      .edge2 { stroke: #475569; stroke-width: 2.2; fill: none; marker-end: url(#arrow); marker-start: url(#arrow); }
+      .you   { stroke: #7c3aed; stroke-width: 2.4; fill: none; marker-end: url(#arrow-you); }
+      .oai   { stroke: #0f766e; stroke-width: 2.4; fill: none; marker-end: url(#arrow-oai); }
+      .box   { rx: 14; stroke-width: 2; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="790" fill="#f8fafc"/>
+  <text x="60" y="58" class="title">Events Scanner</text>
+
+  <!-- ===== LAPTOP ZONE ===== -->
+  <rect x="60" y="100" width="1480" height="338" rx="20" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="8 6"/>
+  <text x="84" y="128" class="zone">YOUR MAC</text>
+
+  <!-- Browser -->
+  <rect x="90" y="170" width="220" height="90" class="box" fill="#f1f5f9" stroke="#94a3b8"/>
+  <text x="200" y="222" class="h">Browser</text>
+
+  <!-- API Gateway -->
+  <rect x="370" y="170" width="300" height="90" class="box" fill="#f1f5f9" stroke="#94a3b8"/>
+  <text x="520" y="212" class="h">API Gateway</text>
+  <text x="520" y="236" class="t">(FastAPI)</text>
+
+  <!-- CrewAI -->
+  <rect x="750" y="170" width="760" height="90" class="box" fill="#fff7ed" stroke="#f97316"/>
+  <text x="1130" y="222" class="h">CrewAI crew</text>
+
+  <!-- One -->
+  <rect x="750" y="330" width="760" height="80" class="box" fill="#eef2ff" stroke="#4f46e5"/>
+  <text x="1130" y="377" class="h">One</text>
+
+  <!-- edges on the laptop -->
+  <path d="M 310 215 L 368 215" class="edge2"/>
+  <path d="M 670 215 L 748 215" class="edge2"/>
+  <path d="M 1130 260 L 1130 328" class="edge2"/>
+  <path d="M 520 262 L 520 370 L 748 370" class="edge2"/>
+
+  <!-- ===== CLOUD ZONE ===== -->
+  <rect x="60" y="480" width="1480" height="260" rx="20" fill="#ffffff" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="8 6"/>
+  <text x="84" y="508" class="zone">CLOUD</text>
+
+  <!-- You.com -->
+  <rect x="90" y="560" width="330" height="130" class="box" fill="#f5f3ff" stroke="#7c3aed"/>
+  <text x="255" y="632" class="h">You.com</text>
+
+  <!-- Daytona -->
+  <rect x="460" y="540" width="680" height="170" class="box" fill="#ecfdf5" stroke="#10b981"/>
+  <text x="800" y="574" class="h">Daytona sandbox</text>
+  <rect x="484" y="592" width="632" height="92" rx="10" fill="#ffffff" stroke="#a7f3d0"/>
+  <text x="800" y="644" class="h2">harness.py  ▸  scan.py</text>
+
+  <!-- OpenAI -->
+  <rect x="1180" y="560" width="330" height="130" class="box" fill="#f0fdfa" stroke="#0f766e"/>
+  <text x="1345" y="632" class="h">OpenAI</text>
+
+  <!-- cloud edges -->
+  <path d="M 1000 412 L 1000 538" class="edge2"/>
+  <path d="M 460 625 L 422 625" class="you"/>
+  <path d="M 1140 625 L 1178 625" class="oai"/>
+</svg>
